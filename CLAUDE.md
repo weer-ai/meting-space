@@ -85,13 +85,43 @@ meting.space 是 Ting 的個人網站，從「航空體驗顧問」改版為**�
 8. Safari 的 `100svh` 與網址列伸縮不可讓段落跳動。
 9. 手機版不互動就能讀完整頁：故事文字是一般 DOM，3D 只是背景。
 
-## 技術棧
+## 技術棧與指令
 
-Next.js（App Router）＋ TypeScript，`output: "export"` 靜態輸出（保持能在 Vercel 與 Cloudflare Pages 間搬）。three 走 npm。Dev/build/test 指令在專案 scaffold 後補在這裡；**不要寫還不存在的指令**。
+Next.js 16（App Router）＋ TypeScript，`output: "export"` 靜態輸出（保持能在 Vercel 與 Cloudflare Pages 間搬）。three 走 npm，`HomeShell` 在 hydration 後才動態載入場景。字體用 `@fontsource-variable/fraunces`、`@fontsource-variable/inter` 自架。樣式是 `styles/global.css`（變數＋v9 移植），不用 Tailwind。
+
+```bash
+npm run dev          # 開發
+npm run build        # 靜態輸出到 out/
+npm run typecheck
+npm test             # vitest：文案逐字比對 + 佈局確定性
+node scripts/shots.cjs --out DIR --dpr 2 --pos top     # 手機390／桌機1440 截圖（需先 build）
+node scripts/interact.cjs                              # 探索模式、點擊、鍵盤、錨點
+node scripts/states.cjs --out DIR                      # reduced-motion、WebGL 失敗
+```
+
+無頭 Chromium 要帶 swiftshader 參數才有 WebGL（腳本已處理）。
+
+### 結構
+
+- `content/copy/home.ts`：首頁英文文案，**必須逐字出自 CONTENT.md**，`tests/copy.test.ts` 會比對，改字就會失敗。`content/copy/ui.ts` 是 CONTENT.md 沒有的介面小字，每條標明來源（v9／新增／調整）。
+- `data/nodes.ts`（節點，逐字出自 Brief）、`data/story.ts`（三個主題節點與兩種標籤）。
+- `components/nodemap/`：`graph.ts`（資料→節點與連線）、`layout.ts`（純函式、確定性佈局）、`scene.ts`（three 場景與互動）。
+- `components/home/`：`HomeStory`（六段落，server）、`HomeShell`（client，持有 canvas 與模式）、`ExploreUI`、`WaitlistForm`。
+
+### 這輪定下的規則
+
+- 每個 `section.s` 是一個階段；`scene.ts` 讀 `section.s` 的位置，**不要改 class 名**。
+- 捲動換算的參考線是視窗 50%（v9 是 55%，會讓每段自己的階段偏離約 9%）。停留 45%／變形 55% 不變。
+- 手機版 `.shade` 只蓋文字區（從 `38svh - 64px` 起），不要改回整段覆蓋，否則段落之間的圖會被蓋掉。
+- 手機版不放固定的「Explore the map」按鈕（會蓋住正在讀的文字）：手機用封面裡的 inline 按鈕，桌機才固定在右下。
+- 標籤有防碰撞與靠邊翻轉；新增節點或標籤後要看手機截圖確認沒有互疊或被切掉。
+- 階段 1 的連線幾乎關閉（`LINE_BASE[1]`），讓三個籃子看起來「彼此不通」；階段 2 才亮起。
+- 手機版籃子位置（`basketCenters(true)`）必須落在文字遮罩上方。
+- 截圖取景用 `--pos top`（段落頂端對齊視窗，等同錨點跳轉看到的畫面）。
 
 ## 工作流程
 
-- 開發 branch：`claude/gracious-allen-o3kejp`。不經 Ting 要求不開 PR、不推其他 branch。
+- 開發 branch：`claude/gracious-allen-o3kejp`。不經 Ting 要求不開 PR、不推其他 branch。階段 A（首頁）已完成並待 Ting 確認截圖。
 - 順序：先首頁（3D 節點圖＋六段落）→ 截圖給 Ting 確認 → 再做 `/cohort`、`/minutes`、`/log` → 最後接表單 → `/zh/cohort` 等 Ting 說可以才做。
 - 每個階段完成都要在**手機 390px 與桌機 1440px**各截一張圖檢查（Playwright 內建 Chromium；無頭模式要開 swiftshader 才有 WebGL），文字不可被節點蓋住；截圖給 Ting 看之後才往下做。
 - 收尾對照 Brief §6 驗收清單：六階段依序變形且每段停得住；階段 1 偏紅、階段 2 換字；探索模式全功能；resize 不跳位；reduced motion 與 WebGL 失敗有替代畫面；`[TBD]` 都是紅色標籤且無內部說明；Lighthouse 行動版效能 ≥ 80。
