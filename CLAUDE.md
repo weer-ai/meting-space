@@ -101,6 +101,8 @@ node scripts/states.cjs --out DIR                      # reduced-motion、WebGL 
 
 無頭 Chromium 要帶 swiftshader 參數才有 WebGL（腳本已處理）。
 
+`vercel.json` 把 framework 固定為 `nextjs`：Vercel 專案是在 `main` 只有文件、沒有 `package.json` 時建立的，Framework 可能被存成「Other」。
+
 ### 結構
 
 - `content/copy/home.ts`：首頁英文文案，**必須逐字出自 CONTENT.md**，`tests/copy.test.ts` 會比對，改字就會失敗。`content/copy/ui.ts` 是 CONTENT.md 沒有的介面小字，每條標明來源（v9／新增／調整）。
