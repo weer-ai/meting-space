@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ME/TING SPACE — node map prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0C0809; --ink:#F6EFE8; --mute:#A89C98; --line:rgba(255,230,215,.17);
+  --blue:#F4A58A; --red:#FF5A4D; --card:rgba(24,15,16,.78);
+  --serif:"Fraunces","Iowan Old Style","Palatino Linotype",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.explore{overflow:hidden}
+h1,h2,.num,.brand,.result,.card .t{font-family:var(--serif);font-optical-sizing:auto}
+.pill{font-family:Inter,sans-serif}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0;touch-action:pan-y}
+body.explore #gl{touch-action:none}
+#labels{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.lab{position:absolute;left:0;top:0;font:500 11.5px/1 Inter,sans-serif;white-space:nowrap;color:var(--ink);
+  padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:rgba(12,8,9,.5);backdrop-filter:blur(6px);opacity:0;will-change:transform,opacity}
+.lab.kw{border-color:rgba(244,165,138,.6);color:#FFD9CB;font:italic 400 14px/1 var(--serif);padding:4px 10px}
+.lab.me{font:italic 400 15px/1 var(--serif);border-color:rgba(255,235,225,.5)}
+
+/* top bar */
+.bar{position:fixed;z-index:5;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 16px 10px}
+.brand{font-weight:500;font-size:19px;line-height:1;letter-spacing:-.01em;font-style:italic}
+.pill{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:10px 16px;font-weight:700;font-size:13px;background:var(--ink);color:#000;text-decoration:none;cursor:pointer}
+.pill.ghost{background:rgba(255,255,255,.08);color:var(--ink);border:1px solid var(--line);backdrop-filter:blur(6px)}
+body.explore .story-only{display:none!important}
+body.explore main{visibility:hidden}
+
+/* story */
+main{position:relative;z-index:2}
+section.s{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 16px 84px;pointer-events:none}
+section.s > *{pointer-events:auto}
+.wrap{max-width:560px}
+.shade{position:absolute;left:0;right:0;bottom:0;height:78%;background:linear-gradient(to top,rgba(12,8,9,.94) 0%,rgba(12,8,9,.82) 45%,rgba(12,8,9,0) 100%);z-index:-1;pointer-events:none}
+section.s{position:relative}
+.eyebrow{font:500 12px/1 Inter;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-bottom:12px}
+.eyebrow b{color:var(--blue);font-weight:600}
+h1{font-weight:400;font-size:clamp(40px,11.5vw,84px);line-height:1;letter-spacing:-.025em}
+h1 em,h2 em{font-style:italic;font-weight:300;color:#FFD0BE}
+h2{font-weight:400;font-size:clamp(30px,8.6vw,60px);line-height:1.02;letter-spacing:-.02em;margin-bottom:14px}
+.lede{margin-top:14px;color:#D4D5DC;font-size:15.5px;line-height:1.5;max-width:46ch}
+.hello{font:500 14px/1 Inter;color:var(--mute);margin-bottom:14px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.tags span{font:600 11px/1 Inter;letter-spacing:.02em;border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:#C8C9D2}
+.list{display:grid;gap:10px;margin-top:6px}
+.item{border-top:1px solid var(--line);padding-top:10px}
+.item h3{font-weight:500;font-size:16px;line-height:1.25;letter-spacing:-.005em;font-family:Inter,sans-serif}
+.item p{color:#C3C4CC;font-size:14px;line-height:1.45;margin-top:4px}
+.item .k{font:500 11px/1 Inter;letter-spacing:.12em;color:var(--blue);margin-right:6px}
+.result{margin-top:14px;font-style:italic;font-weight:400;font-size:20px;line-height:1.25;letter-spacing:-.01em;color:#FFD9CB}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:6px}
+.stat{border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.03)}
+.stat .num{font-weight:400;font-size:34px;letter-spacing:-.02em;line-height:1}
+.stat small{display:block;margin-top:6px;color:#B5B6C0;font-size:12px;line-height:1.35}
+.awards{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.awards span{font:500 11px/1.2 Inter;border:1px solid rgba(244,165,138,.5);color:#FFD9CB;border-radius:999px;padding:6px 10px}
+.todo{display:block;margin-top:8px;font-size:12px;line-height:1.4;color:var(--red);background:rgba(255,90,60,.1);border:1px dashed rgba(255,90,60,.55);border-radius:8px;padding:6px 8px}
+.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.pill.blue{background:var(--blue);color:#2A130C}
+.mail{color:var(--mute);font-size:13px;margin-top:14px}
+.hint{position:fixed;z-index:4;right:16px;bottom:calc(20px + env(safe-area-inset-bottom))}
+.draft{position:fixed;z-index:6;left:12px;bottom:calc(20px + env(safe-area-inset-bottom));font:600 10px/1 Inter;letter-spacing:.08em;text-transform:uppercase;color:var(--red);background:rgba(12,8,9,.8);border:1px solid rgba(255,90,60,.5);border-radius:999px;padding:7px 10px}
+body.explore .draft{display:none}
+
+/* explore */
+body:not(.explore) .xui{display:none!important}
+.xtop{position:fixed;z-index:6;top:calc(12px + env(safe-area-inset-top));right:14px}
+.chips{position:fixed;z-index:6;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;gap:8px;overflow-x:auto;padding:0 14px 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid var(--line);background:rgba(10,11,18,.7);color:var(--ink);font:600 13px/1 Inter;border-radius:999px;padding:10px 14px;backdrop-filter:blur(6px);cursor:pointer}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#2A130C}
+.xhelp{position:fixed;z-index:6;left:16px;top:calc(62px + env(safe-area-inset-top));font:500 12px/1.4 Inter;color:var(--mute);max-width:70vw}
+.card{position:fixed;z-index:7;left:12px;right:12px;bottom:calc(64px + env(safe-area-inset-bottom));max-width:520px;margin:auto;background:var(--card);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:18px;padding:16px;display:none}
+.card.show{display:block}
+.card .t{font-weight:400;font-size:26px;line-height:1.1;letter-spacing:-.015em}
+.card .m{font:500 11px/1 Inter;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+.card p{margin-top:8px;color:#D2D3DB;font-size:14px;line-height:1.5}
+.card .tg{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.card .tg span{font:600 11px/1 Inter;border:1px solid var(--line);border-radius:999px;padding:5px 9px;color:#C8C9D2}
+.card .x{position:absolute;top:10px;right:12px;background:none;border:0;color:var(--mute);font-size:20px;cursor:pointer}
+
+@media (max-width:899px){
+  section.s{padding-bottom:64px}
+  .shade{height:72%}
+  h1{font-size:clamp(34px,9.6vw,60px)}
+  h2{font-size:clamp(28px,7.8vw,44px);margin-bottom:10px}
+  .lede{font-size:14.5px;margin-top:10px}
+  .tags{margin-top:12px}
+  #s2 .item p{display:none}
+  .item{padding-top:8px}
+  .item h3{font-size:15px}
+  .todo{font-size:11px;padding:5px 7px}
+  .stat{padding:10px}.stat .num{font-size:26px}
+}
+@media (min-width:900px){
+  section.s{padding:0 6vw 9vh}
+  .wrap{max-width:520px}
+  .shade{width:60%;height:100%;background:linear-gradient(to right,rgba(12,8,9,.92),rgba(12,8,9,0))}
+  .card{left:auto;right:24px;margin:0;bottom:90px;width:380px}
+}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="labels"></div>
+
+<div class="bar">
+  <div class="brand">me/ting space</div>
+  <a class="pill story-only" href="#contact">Plan a meeting</a>
+  <button class="pill ghost xui" id="exitTop" style="display:none">Back to story ✕</button>
+</div>
+
+<main>
+  <section class="s" id="s0" data-stage="0">
+    <div class="shade"></div>
+    <div class="wrap">
+      <div class="hello">Hi, nice me(e)ting you.</div>
+      <h1>I find the <em>thread</em>, then bring everyone <em>across the gap.</em></h1>
+      <p class="lede">Fifteen years of getting airlines, airports, brands and engineers to agree on one standard, then proving it works before anyone builds it.</p>
+      <div class="tags"><span>Ex-Lufthansa Group</span><span>Ex-Accenture</span><span>Ex-Boeing 777X</span><span>EU Horizon 2020</span><span>US Patent Holder</span><span>Red Dot</span><span>Webby</span></div>
+      <span class="todo">Patent count to confirm: LinkedIn lists 1, resume says 7.</span>
+    </div>
+  </section>
+
+  <section class="s" id="s1" data-stage="1">
+    <div class="shade"></div>
+    <div class="wrap">
+      <div class="eyebrow"><b>(01)</b> Pain</div>
+      <h2>Big mobility visions stall in <em>three places.</em></h2>
+      <div class="list">
+        <div class="item"><h3><span class="k">A</span>Every stakeholder has a different incentive.</h3><p>Airline, airport, retailer, vendor and regulator all say yes to the goal, then pull in different directions.</p></div>
+        <div class="item"><h3><span class="k">B</span>Every market has its own culture and habits.</h3><p>What lands in Frankfurt or Amsterdam does not land the same way in Taipei or Singapore.</p></div>
+        <div class="item"><h3><span class="k">C</span>Every channel holds a piece of the experience.</h3><p>App, hardware, community and space rarely share information, so the traveler feels the seams.</p></div>
+      </div>
+      <div class="result">The vision is clear. The delivery is a negotiation.</div>
+      <span class="todo">Add one real incident for each (P1).</span>
+    </div>
+  </section>
+
+  <section class="s" id="s2" data-stage="2">
+    <div class="shade"></div>
+    <div class="wrap">
+      <div class="eyebrow"><b>(02)</b> Approach</div>
+      <h2>How I <em>win.</em></h2>
+      <div class="list">
+        <div class="item"><h3><span class="k">A</span>I speak the room's language.</h3><p>International companies, work abroad, foreign languages.</p></div>
+        <div class="item"><h3><span class="k">B</span>I coordinate people who do not report to me.</h3><p>12 EU partners. Five airlines. A loyalty programme across 18 carriers.</p></div>
+        <div class="item"><h3><span class="k">C</span>I turn business bottlenecks into actions.</h3><p>Consulting at Accenture and Designit.</p></div>
+        <div class="item"><h3><span class="k">D</span>I plan the whole product.</h3><p>Software, hardware, space and service as one system.</p></div>
+        <div class="item"><h3><span class="k">E</span>I ground it in people and evidence.</h3><p>Design methods, psychology, AI.</p></div>
+      </div>
+      <span class="todo">Languages, the 18-carrier figure (resume shows 235M customers) and psychology source to confirm.</span>
+    </div>
+  </section>
+
+  <section class="s" id="s3" data-stage="3">
+    <div class="shade"></div>
+    <div class="wrap">
+      <div class="eyebrow"><b>(03)</b> Proof</div>
+      <h2>What the work <em>produced.</em></h2>
+      <div class="stats">
+        <div class="stat"><div class="num">12</div><small>EU partners, Horizon 2020 PASSME</small></div>
+        <div class="stat"><div class="num">5</div><small>airlines, Lufthansa Group 2025</small></div>
+        <div class="stat"><div class="num">+60%</div><small>galley workspace, Boeing 777X</small></div>
+        <div class="stat"><div class="num">$150M</div><small>potential revenue, gategroup</small></div>
+      </div>
+      <div class="awards"><span>Red Dot — Design Concept Winner</span><span>Webby Winner &amp; People's Voice</span><span>GSMA GLOMO</span><span>Crystal Cabin 2016 — Finalist (FiO)</span></div>
+      <span class="todo">Add: languages, stage talks, C-level work. Lufthansa +12% / +18% cleared for public? (P13)</span>
+    </div>
+  </section>
+
+  <section class="s" id="s4" data-stage="4">
+    <div class="shade"></div>
+    <div class="wrap">
+      <div class="eyebrow"><b>(04)</b> Why me</div>
+      <h2>Not the <em>usual</em> choice.</h2>
+      <div class="list">
+        <div class="item"><h3>Unlike a typical strategist, I can build the actual product.</h3></div>
+        <div class="item"><h3>Unlike an employee waiting for an assignment, I seek out the opportunity and act on it.</h3></div>
+        <div class="item"><h3>Unlike a quiet builder, I speak up for what I believe should exist.</h3></div>
+      </div>
+      <span class="todo">Add one example under each (Weer, Network School build, a talk).</span>
+    </div>
+  </section>
+
+  <section class="s" id="contact" data-stage="5">
+    <div class="shade"></div>
+    <div class="wrap">
+      <div class="eyebrow"><b>(05)</b> Ask</div>
+      <h2>Let's have a <em>me/ting.</em></h2>
+      <div class="list">
+        <div class="item"><h3><span class="k">LEAD</span>Curate and carry a whole journey.</h3><p>Airport, rail hub, airline, hotel or premium retail in Taiwan and Asia-Pacific.</p></div>
+        <div class="item"><h3><span class="k">BRIDGE</span>Land international brands in the region.</h3><p>And help Taiwan teams meet the world.</p></div>
+        <div class="item"><h3><span class="k">ADVISE</span>Take a seat on an advisory board.</h3><p>Government or industry body.</p></div>
+      </div>
+      <div class="cta"><a class="pill blue" href="mailto:ting@meting.space">Plan a meeting</a><button class="pill ghost" id="openMap2">Explore the map</button></div>
+      <div class="mail">ting@meting.space</div>
+    </div>
+  </section>
+</main>
+
+<button class="pill ghost hint story-only" id="openMap">Explore the map ↗</button>
+<div class="draft story-only">Draft · red = to fill</div>
+
+<div class="xui xhelp">Drag to turn. Tap a dot. Pick a keyword below.</div>
+<div class="xui xtop"><button class="pill" id="exit">Back to story ✕</button></div>
+<div class="xui chips" id="chips"></div>
+<div class="card" id="card"><button class="x" id="cardX" aria-label="Close">×</button><div class="m" id="cm"></div><div class="t" id="ct"></div><p id="cp"></p><span class="todo" id="cd" style="display:none"></span><div class="tg" id="cg"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+"use strict";
+/* ---------- DATA (verified facts only; gaps are flagged) ---------- */
+var KW=["Stakeholders","Cross-market","Omnichannel","Hardware","Software","Space","Service","Evidence","AI"];
+var KWTXT={
+ "Stakeholders":"Aligning many parties with different incentives on one plan.",
+ "Cross-market":"Making things land across countries and cultures.",
+ "Omnichannel":"App, hardware, community and space as one experience.",
+ "Hardware":"Physical products, cabins and devices.",
+ "Software":"Apps, systems and digital products.",
+ "Space":"Cabins, stores, hotels and airports.",
+ "Service":"Service design: the people and processes behind the screen.",
+ "Evidence":"Testing with users and data before the budget is spent.",
+ "AI":"AI-enabled tools and building with AI."};
+var G={S:0,M:1,C:2,F:3}; // pain-stage group: stakeholders, markets, channels, free
+var P=[
+ {n:"PASSME",y:"2014–15",g:"S",k:["Stakeholders","Cross-market","Evidence"],t:"EU Horizon 2020 programme with 12 partners. Early planning and strategy with TU Delft.",todo:"My role and the outcome to come (P2).",hi:3},
+ {n:"Lufthansa Group",y:"2025",g:"S",k:["Stakeholders","Omnichannel","Software","AI"],t:"Product strategy across five airlines: Lufthansa, SWISS, Austrian, Brussels, ITA. Bookings +12%, task completion +18% through AI-enabled and offline-first tools.",todo:"Confirm the metrics are cleared for public (P13) and the end date (P12).",hi:3},
+ {n:"SkyTeam loyalty",y:"2013–14",g:"S",k:["Stakeholders","Software","Evidence"],t:"Self-sourced the client, then led a 6-person TU Delft team for six months on the loyalty app. Programme serves 235M customers.",todo:"Confirm the 18-airline figure and add it to the resume.",hi:3},
+ {n:"Accenture",y:"2016–21",g:"S",k:["Stakeholders","Service","Evidence"],t:"30+ design sprints, converting MVPs into full products for brands incl. Heineken, Shell and Philips.",todo:"Add one C-level example (P3).",hi:0},
+ {n:"gategroup",y:"2021",g:"S",k:["Software","Service","Stakeholders"],t:"A new digital business product during COVID-19, with $150M potential revenue, plus a full design system for iOS, Android and Web.",hi:3},
+ {n:"Designit",y:"2011–12",g:"M",k:["Cross-market","Service"],t:"Service design in Munich, helping Western brands bridge into the China market.",hi:0},
+ {n:"BMW",y:"2011",g:"M",k:["Cross-market","Hardware"],t:"Concept designer in Munich, bridging Chinese market design preferences.",hi:0},
+ {n:"citizenM",y:"2012",g:"M",k:["Cross-market","Service","Space"],t:"Student-run consultancy, posted on site in Hong Kong for two months.",hi:0},
+ {n:"PVH",y:"2016–21",g:"M",k:["Omnichannel","Cross-market","Space"],t:"Accenture client work for the Tommy Hilfiger group.",todo:"Role and result to come.",hi:0},
+ {n:"Boeing 777X",y:"2014–15",g:"C",k:["Hardware","Space","Evidence"],t:"Galley workspace +60%, toilet legroom +6 cm. Won stakeholder buy-in and an MVP budget presenting to Boeing's Director.",hi:3},
+ {n:"FiO cabin",y:"2016",g:"C",k:["Hardware","Space"],t:"An adaptive aircraft entry concept. Crystal Cabin Award 2016 finalist, University category.",todo:"Confirm role, team and link to B/E Aerospace.",hi:3},
+ {n:"Schiphol",y:"2013",g:"C",k:["Hardware","Software","Space","Evidence"],t:"Hand-luggage scanner prototype for Schiphol Airport using computer vision.",todo:"Choose the framing: boarding and delay, or the 7-second check-in.",hi:0},
+ {n:"Rituals",y:"2021–",g:"C",k:["Omnichannel","Space","Software"],t:"In-store sales +19% and membership sign-ups +14% through redesign. Part of 22% eCommerce growth via omni-channel design.",hi:3},
+ {n:"Smartify",y:"2016–21",g:"C",k:["Software","Cross-market"],t:"Webby Winner and People's Voice. GSMA GLOMO Most Innovative Mobile App.",todo:"My role and result to come.",hi:3},
+ {n:"GrandVision",y:"2016–21",g:"C",k:["Omnichannel","Space"],t:"Accenture client work.",todo:"Role and result to come.",hi:0},
+ {n:"Philips Smart Home",y:"2021–",g:"C",k:["Software","Hardware","Service"],t:"Onboarding and in-app control for a smart humidifier, for a global smart-home audience.",hi:0},
+ {n:"Amstel + NH",y:"2021–",g:"C",k:["Space","Service"],t:"Brand, service and spatial design for boutique hospitality events for 200+ guests.",hi:0},
+ {n:"Weer",y:"2023–",g:"F",k:["Software","AI","Service"],t:"Founder. A B2B2C circular-economy marketplace for lightweight travel gear.",hi:4}
+];
+var N=[],ME=0;
+N.push({n:"ME/TING",kind:"me",k:[],g:"F",t:"",y:"",hi:0});
+KW.forEach(function(w){N.push({n:w,kind:"kw",k:[],g:w==="Stakeholders"?"S":w==="Cross-market"?"M":w==="Omnichannel"?"C":"F",t:KWTXT[w],y:""});});
+P.forEach(function(p){p.kind="p";N.push(p);});
+var idx={};N.forEach(function(o,i){idx[o.n]=i;});
+var E=[];N.forEach(function(o,i){if(o.kind==="p")o.k.forEach(function(w){E.push([i,idx[w]]);});});
+
+/* highlight sets per stage (label + brightness) */
+var LAB=[
+ ["ME/TING"],
+ ["Stakeholders","Cross-market","Omnichannel"],
+ KW,
+ P.filter(function(p){return p.hi===3;}).map(function(p){return p.n;}),
+ ["Weer","AI","Software","Hardware","Boeing 777X"],
+ []
+];
+
+/* ---------- THREE SETUP ---------- */
+var canvas=document.getElementById("gl");
+var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:false});
+var DPR=Math.min(window.devicePixelRatio||1,2);
+renderer.setPixelRatio(DPR);
+renderer.setClearColor(0x0C0809,1);
+var scene=new THREE.Scene();
+var cam=new THREE.PerspectiveCamera(50,1,0.1,100);
+cam.position.set(0,0,12);
+var root=new THREE.Group();scene.add(root);
+
+var portrait=false,R=3.4,vw=1,vh=1;
+function resize(){
+  vw=window.innerWidth;vh=window.innerHeight;
+  renderer.setSize(vw,vh,false);
+  cam.aspect=vw/vh;cam.updateProjectionMatrix();
+  portrait=vw<900&&vh>vw*0.9;
+  R=portrait?1.7:3.6;
+  buildTargets();
+}
+
+var rnd=(function(){var s=7;return function(){s=(s*16807)%2147483647;return (s-1)/2147483646;};})();
+function unit(){var u=rnd()*2-1,t=rnd()*6.2832,r=Math.sqrt(1-u*u);return [r*Math.cos(t),u,r*Math.sin(t)];}
+function fib(i,n){var y=1-2*(i+.5)/n,r=Math.sqrt(1-y*y),a=i*2.399963;return [r*Math.cos(a),y,r*Math.sin(a)];}
+
+var NN=N.length;
+var DN=(portrait?900:1500);
+DN=Math.min(window.innerWidth<700?900:1600,1600);
+var dustBase=[];for(var i=0;i<DN;i++){dustBase.push({u:unit(),r:rnd(),g:i%4});}
+var nodeJit=N.map(function(){return unit();});
+var NT=[],DT=[]; // targets per stage: NT[s][i]=[x,y,z], DT[s]=Float32Array
+
+function sphereLayout(){
+  var out=new Array(NN);
+  var kd={};KW.forEach(function(w,i){kd[w]=fib(i,KW.length);});
+  out[ME]=[0,0,0];
+  KW.forEach(function(w){var d=kd[w];out[idx[w]]=[d[0]*R*.55,d[1]*R*.55,d[2]*R*.55];});
+  P.forEach(function(p){
+    var s=[0,0,0];p.k.forEach(function(w){var d=kd[w];s[0]+=d[0];s[1]+=d[1];s[2]+=d[2];});
+    var j=nodeJit[idx[p.n]];s[0]+=j[0]*.35;s[1]+=j[1]*.35;s[2]+=j[2]*.35;
+    var l=Math.hypot(s[0],s[1],s[2])||1,rr=R*(1+(rnd()-.5)*.18);
+    out[idx[p.n]]=[s[0]/l*rr,s[1]/l*rr,s[2]/l*rr];
+  });
+  return out;
+}
+function shellLayout(){
+  var out=new Array(NN);out[ME]=[0,0,0];
+  for(var i=1;i<NN;i++){var d=fib(i*3%NN,NN),r=R*(N[i].kind==="kw"?.8:1.05);out[i]=[d[0]*r,d[1]*r,d[2]*r];}
+  return out;
+}
+function clusterLayout(){
+  var out=new Array(NN);
+  var k=portrait?.62:1;
+  var C=portrait?[[-.95,.5],[.95,.5],[0,-.8]]:[[-1.55,.5],[1.55,.5],[0,-1.3]];
+  var cnt={S:0,M:0,C:0,F:0};
+  out[ME]=[0,0,0];
+  for(var i=1;i<NN;i++){
+    var g=N[i].g,c;
+    if(g==="F"){var d=unit();out[i]=[d[0]*R*1.5*(portrait?.8:1),d[1]*R*1.1,d[2]*R*.4];continue;}
+    c=C[G[g]];
+    var d=unit(),rr=R*.62*k*(N[i].kind==="kw"?.15:.9);
+    out[i]=[c[0]*R*(portrait?1.15:1)+d[0]*rr,c[1]*R*(portrait?1.15:1)+d[1]*rr,d[2]*rr*.8];
+  }
+  return out;
+}
+function convergeLayout(){
+  var out=new Array(NN);
+  for(var i=0;i<NN;i++){var d=fib(i*5%NN,NN);var r=i===0?0:R*.22;out[i]=[d[0]*r,d[1]*r,d[2]*r];}
+  return out;
+}
+function dustFor(stage){
+  var a=new Float32Array(DN*3);
+  var Cc=portrait?[[-.95,.5],[.95,.5],[0,-.8]]:[[-1.55,.5],[1.55,.5],[0,-1.3]];
+  for(var i=0;i<DN;i++){
+    var b=dustBase[i],u=b.u,r=b.r,x,y,z;
+    if(stage===0){var rr=R*(.9+r*1.4);x=u[0]*rr;y=u[1]*rr;z=u[2]*rr;}
+    else if(stage===1){
+      if(b.g===3){var rr=R*(1.1+r*1.2);x=u[0]*rr;y=u[1]*rr;z=u[2]*rr;}
+      else{var c=Cc[b.g%3],k=portrait?1.15:1,rr=R*(.2+r*.8)*(portrait?.6:.62);x=c[0]*R*k+u[0]*rr;y=c[1]*R*k+u[1]*rr;z=u[2]*rr*.8;}
+    }
+    else if(stage===5){var rr=R*(.15+r*.55);x=u[0]*rr;y=u[1]*rr;z=u[2]*rr;}
+    else{var rr=R*(1.15+r*(stage===4?.9:1.1));x=u[0]*rr;y=u[1]*rr;z=u[2]*rr;}
+    if(stage!==1&&stage!==5){var q=Math.hypot(x,y,z)/R,an=q*.75,ca=Math.cos(an),sa=Math.sin(an),nx=x*ca-z*sa;z=x*sa+z*ca;x=nx;y*=.82;}
+    a[i*3]=x;a[i*3+1]=y;a[i*3+2]=z;
+  }
+  return a;
+}
+function buildTargets(){
+  var sph=sphereLayout();
+  NT=[shellLayout(),clusterLayout(),sph,sph,sph,convergeLayout()];
+  DT=[0,1,2,3,4,5].map(dustFor);
+  NT.explore=sph.map(function(p){return [p[0]*1.3,p[1]*1.3,p[2]*1.3];});
+}
+
+/* geometry */
+var vert=[
+"attribute float size;attribute float alpha;attribute vec3 col;varying float vA;varying vec3 vC;uniform float scale;",
+"void main(){vA=alpha;vC=col;vec4 mv=modelViewMatrix*vec4(position,1.);gl_Position=projectionMatrix*mv;gl_PointSize=size*scale/(-mv.z);}"
+].join("\n");
+var frag=[
+"varying float vA;varying vec3 vC;",
+"void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;float core=smoothstep(.14,.0,d);float glow=pow(smoothstep(.5,.0,d),1.6);",
+"gl_FragColor=vec4(vC*(glow*.8+core*1.3),(glow*.8+core)*vA);}"
+].join("\n");
+function mkPoints(n,dynamic){
+  var g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.BufferAttribute(new Float32Array(n*3),3));
+  g.setAttribute("size",new THREE.BufferAttribute(new Float32Array(n),1));
+  g.setAttribute("alpha",new THREE.BufferAttribute(new Float32Array(n),1));
+  g.setAttribute("col",new THREE.BufferAttribute(new Float32Array(n*3),3));
+  var m=new THREE.ShaderMaterial({vertexShader:vert,fragmentShader:frag,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,uniforms:{scale:{value:1}}});
+  var p=new THREE.Points(g,m);p.frustumCulled=false;root.add(p);return p;
+}
+var dust=mkPoints(DN),nodes=mkPoints(NN);
+var lineGeo=new THREE.BufferGeometry();
+var SEG=10,OW=E.map(function(){return unit();});
+lineGeo.setAttribute("position",new THREE.BufferAttribute(new Float32Array(E.length*SEG*6),3));
+lineGeo.setAttribute("color",new THREE.BufferAttribute(new Float32Array(E.length*SEG*6),3));
+var lineMat=new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:1,blending:THREE.AdditiveBlending,depthWrite:false});
+var lines=new THREE.LineSegments(lineGeo,lineMat);lines.frustumCulled=false;root.add(lines);
+
+/* init dust colours (warm, with a few soft bokeh discs) */
+(function(){
+  var c=dust.geometry.attributes.col.array,s=dust.geometry.attributes.size.array,a=dust.geometry.attributes.alpha.array;
+  var pal=[[1,.62,.5],[.92,.52,.64],[1,.78,.42],[.86,.78,.74],[.86,.78,.74]];
+  for(var i=0;i<DN;i++){
+    var v=pal[Math.floor(rnd()*pal.length)];c[i*3]=v[0];c[i*3+1]=v[1];c[i*3+2]=v[2];
+    if(rnd()<.06){s[i]=26+rnd()*30;a[i]=.1+rnd()*.08;}else{s[i]=3+rnd()*6;a[i]=.3+rnd()*.5;}
+  }
+  dust.geometry.attributes.col.needsUpdate=s.needsUpdate=true;
+})();
+
+/* labels */
+var labBox=document.getElementById("labels"),labEl=[];
+N.forEach(function(o,i){
+  var d=document.createElement("div");d.className="lab"+(o.kind==="kw"?" kw":"")+(o.kind==="me"?" me":"");d.textContent=o.kind==="me"?"me/ting":o.n;labBox.appendChild(d);labEl[i]=d;
+});
+
+/* ---------- STATE ---------- */
+var tops=[],stageF=0,tgtF=0,mode="story",filter=null,sel=-1,rotY=0,rotX=0,vY=0,drag=false,lx=0,ly=0,zoom=1,exploreK=0;
+var sections=[].slice.call(document.querySelectorAll("section.s"));
+function measure(){tops=sections.map(function(s){return s.offsetTop;});}
+function stageFromScroll(){
+  var y=window.scrollY+vh*.55,n=sections.length,i=0;
+  for(i=0;i<n-1;i++){if(y<tops[i+1])break;}
+  var h=(i<n-1?tops[i+1]:tops[i]+sections[i].offsetHeight)-tops[i];
+  var f=Math.max(0,Math.min(1,(y-tops[i])/h));
+  // hold the stage in the middle of a section, move in the last 40%
+  var t=f<.45?0:(f-.45)/.55;t=t*t*(3-2*t);
+  return i+(i<n-1?t:0);
+}
+function ease(t){return t*t*(3-2*t);}
+function lerp(a,b,t){return a+(b-a)*t;}
+var COL={p:[1,.82,.7],kw:[1,.58,.5],me:[1,.95,.9],red:[.95,.45,.4]};
+
+/* ---------- LOOP ---------- */
+var sx=new Float32Array(NN),sy=new Float32Array(NN),sd=new Float32Array(NN),sv=new Uint8Array(NN);
+var cur=new Float32Array(NN*3);
+function frame(t){
+  requestAnimationFrame(frame);
+  tgtF=stageFromScroll();
+  stageF+=(tgtF-stageF)*.09;
+  var a=Math.max(0,Math.min(4,Math.floor(stageF))),b=Math.min(5,a+1),f=ease(stageF-a);
+  if(stageF>=5){a=5;b=5;f=0;}
+  var ex=mode==="explore";
+  exploreK+=((ex?1:0)-exploreK)*.08;
+
+  var np=nodes.geometry.attributes.position.array,ns=nodes.geometry.attributes.size.array,na=nodes.geometry.attributes.alpha.array,nc=nodes.geometry.attributes.col.array;
+  var stA=Math.round(stageF),lab=LAB[Math.max(0,Math.min(5,stA))];
+  for(var i=0;i<NN;i++){
+    var pa=NT[a][i],pb=NT[b][i],pe=NT.explore[i];
+    var x=lerp(lerp(pa[0],pb[0],f),pe[0],exploreK),y=lerp(lerp(pa[1],pb[1],f),pe[1],exploreK),z=lerp(lerp(pa[2],pb[2],f),pe[2],exploreK);
+    var tq=t*.001,A=R*.035;x+=Math.sin(tq*.6+i*1.3)*A;y+=Math.sin(tq*.5+i*2.1)*A;z+=Math.sin(tq*.4+i*.9)*A;
+    cur[i*3]=x;cur[i*3+1]=y;cur[i*3+2]=z;
+    np[i*3]=x;np[i*3+1]=y;np[i*3+2]=z;
+    var o=N[i],isKw=o.kind==="kw",isMe=o.kind==="me";
+    var inLab=lab.indexOf(o.n)>=0;
+    var on=1,dim=1;
+    if(ex){
+      if(filter){on=(isKw?o.n===filter:(o.k.indexOf(filter)>=0))?1:.12;}
+    }else{
+      if(stA===3)dim=inLab?1:.35;
+      else if(stA===4)dim=inLab?1:.3;
+      else if(stA===0)dim=isMe?1:.7;
+      else if(stA===5)dim=.8;
+    }
+    var base=isMe?30:isKw?22:15;
+    ns[i]=base*(inLab&&!ex?1.4:1)*(i===sel?1.7:1);
+    na[i]=Math.min(1,on*dim*(isMe&&stA!==0&&stA!==5&&!ex?0:1));
+    var c=COL[isMe?"me":isKw?"kw":"p"];
+    if(stA===1&&!ex&&!isMe&&!isKw)c=[.85,.62,.62];
+    if(stA===1&&!ex&&isKw)c=COL.red;
+    if(o.todo&&ex)c=[1,.9,.55];
+    nc[i*3]=c[0];nc[i*3+1]=c[1];nc[i*3+2]=c[2];
+  }
+  nodes.geometry.attributes.position.needsUpdate=ns.needsUpdate||true;
+  nodes.geometry.attributes.size.needsUpdate=nodes.geometry.attributes.alpha.needsUpdate=nodes.geometry.attributes.col.needsUpdate=true;
+
+  var dp=dust.geometry.attributes.position.array;
+  var A=DT[a],B=DT[b],Ex=DT[2];
+  var tq2=t*.001,DA=R*.025;for(var j=0;j<DN*3;j++){var v=lerp(A[j],B[j],f);dp[j]=lerp(v,Ex[j]*1.1,exploreK)+Math.sin(tq2*.5+j*.61)*DA;}
+  dust.geometry.attributes.position.needsUpdate=true;
+  dust.material.uniforms.scale.value=nodes.material.uniforms.scale.value=vh*.5*DPR/Math.tan(cam.fov*Math.PI/360)*.0150;
+
+  /* lines: soft curved filaments */
+  var lp=lineGeo.attributes.position.array,lc=lineGeo.attributes.color.array;
+  var base=ex?.6:(stA===0?.06:stA===1?.12:stA===2?.42:stA===3?.24:stA===4?.26:0);
+  var red=(stA===1&&!ex),tt=t*.001;
+  var cr=red?.8:1,cg=red?.5:.62,cb=red?.55:.5;
+  var w=0;
+  for(var e=0;e<E.length;e++){
+    var p=E[e][0],q=E[e][1];
+    var ax=cur[p*3],ay=cur[p*3+1],az=cur[p*3+2],bx=cur[q*3],by=cur[q*3+1],bz=cur[q*3+2];
+    var len=Math.hypot(bx-ax,by-ay,bz-az),o=OW[e],sway=1+.15*Math.sin(tt*.8+e);
+    var cx=(ax+bx)/2+o[0]*len*.45*sway,cy=(ay+by)/2+o[1]*len*.45*sway,cz=(az+bz)/2+o[2]*len*.45*sway;
+    var k=base;
+    if(ex&&filter){k=(N[q].n===filter)?1:.04;}
+    if(ex&&sel>=0){k=(p===sel||q===sel)?1:k*.4;}
+    for(var sg=0;sg<=SEG;sg++){
+      var u=sg/SEG,m=1-u,X=m*m*ax+2*m*u*cx+u*u*bx,Y=m*m*ay+2*m*u*cy+u*u*by,Z=m*m*az+2*m*u*cz+u*u*bz;
+      var fd=(.3+.7*Math.sin(Math.PI*u))*k;
+      if(sg>0){ // end of previous segment == this point
+        lp[w]=X;lp[w+1]=Y;lp[w+2]=Z;lc[w]=cr*fd;lc[w+1]=cg*fd;lc[w+2]=cb*fd;w+=3;
+      }
+      if(sg<SEG){lp[w]=X;lp[w+1]=Y;lp[w+2]=Z;lc[w]=cr*fd;lc[w+1]=cg*fd;lc[w+2]=cb*fd;w+=3;}
+    }
+  }
+  lineGeo.attributes.position.needsUpdate=lineGeo.attributes.color.needsUpdate=true;
+
+  /* rotation + camera */
+  if(!drag){vY*=.95;rotY+=vY+(ex?.0012:.0016);}
+  rotX+=(0-rotX)*(ex?0:.04);
+  root.rotation.y=rotY;root.rotation.x=rotX;
+  var offY=portrait?lerp(2.95,0,exploreK):0;
+  var offX=portrait?0:lerp(2.2,0,exploreK);
+  root.position.set(offX,offY,0);
+  var s=zoom;root.scale.set(s,s,s);
+  cam.position.z=12;
+  renderer.render(scene,cam);
+
+  /* project labels */
+  root.updateMatrixWorld();
+  var v3=new THREE.Vector3();
+  for(var i2=0;i2<NN;i2++){
+    v3.set(cur[i2*3],cur[i2*3+1],cur[i2*3+2]).applyMatrix4(root.matrixWorld).project(cam);
+    var X=(v3.x*.5+.5)*vw,Y=(-v3.y*.5+.5)*vh,vis=v3.z<1;
+    sx[i2]=X;sy[i2]=Y;sd[i2]=v3.z;sv[i2]=vis?1:0;
+    var el=labEl[i2],o2=N[i2],show=0;
+    if(ex){
+      if(filter){show=(o2.kind==="kw"?o2.n===filter:o2.k.indexOf(filter)>=0)?1:0;}
+      else show=(o2.kind==="kw"||i2===sel)?1:0;
+      if(i2===sel)show=1;
+      if(o2.kind==="me")show=0;
+    }else{show=lab.indexOf(o2.n)>=0?1:0;}
+    if(o2.kind==="me"&&!ex)show=(stA===0||stA===5)?1:0;
+    var depthFade=ex?Math.max(.35,1-(v3.z-.9)*6):1;
+    el.style.opacity=show?Math.min(1,depthFade):0;
+    el.style.transform="translate("+(X+10).toFixed(1)+"px,"+(Y-8).toFixed(1)+"px)";
+  }
+}
+
+/* ---------- INTERACTION ---------- */
+var card=document.getElementById("card");
+function showCard(i){
+  sel=i;var o=N[i];
+  document.getElementById("cm").textContent=o.kind==="kw"?"Keyword":("Project · "+o.y);
+  document.getElementById("ct").textContent=o.n;
+  document.getElementById("cp").textContent=o.t;
+  var d=document.getElementById("cd");if(o.todo){d.style.display="block";d.textContent=o.todo;}else d.style.display="none";
+  var g=document.getElementById("cg");g.innerHTML="";
+  if(o.kind==="p"){o.k.forEach(function(w){var s=document.createElement("span");s.textContent=w;g.appendChild(s);});}
+  else{P.filter(function(p){return p.k.indexOf(o.n)>=0;}).forEach(function(p){var s=document.createElement("span");s.textContent=p.n;g.appendChild(s);});}
+  card.classList.add("show");
+}
+function hideCard(){sel=-1;card.classList.remove("show");}
+document.getElementById("cardX").onclick=hideCard;
+
+var chipBox=document.getElementById("chips");
+function mkChip(label,val){
+  var c=document.createElement("button");c.className="chip"+(val===filter?" on":"");c.textContent=label;
+  c.onclick=function(){filter=val;hideCard();[].forEach.call(chipBox.children,function(x){x.classList.remove("on");});c.classList.add("on");};
+  chipBox.appendChild(c);return c;
+}
+mkChip("All",null).classList.add("on");KW.forEach(function(w){mkChip(w,w);});
+
+function enter(){
+  mode="explore";document.body.classList.add("explore");
+  document.getElementById("exitTop").style.display="none";
+  window.__y=window.scrollY;window.scrollTo(0,window.scrollY);
+  filter=null;hideCard();
+  [].forEach.call(chipBox.children,function(x,i){x.classList.toggle("on",i===0);});
+}
+function leave(){
+  mode="story";document.body.classList.remove("explore");filter=null;hideCard();
+  window.scrollTo(0,window.__y||0);
+}
+document.getElementById("openMap").onclick=enter;
+document.getElementById("openMap2").onclick=enter;
+document.getElementById("exit").onclick=leave;
+window.addEventListener("keydown",function(e){if(e.key==="Escape"&&mode==="explore")leave();});
+
+var downX=0,downY=0,moved=0;
+canvas.addEventListener("pointerdown",function(e){if(mode!=="explore")return;drag=true;lx=downX=e.clientX;ly=downY=e.clientY;moved=0;canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener("pointermove",function(e){
+  if(!drag)return;var dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);
+  rotY+=dx*.006;vY=dx*.006;rotX=Math.max(-1,Math.min(1,rotX+dy*.004));
+});
+canvas.addEventListener("pointerup",function(e){
+  if(!drag)return;drag=false;
+  if(moved<8){ // tap: nearest visible node
+    var best=-1,bd=34*34;
+    for(var i=0;i<NN;i++){
+      if(!sv[i]||N[i].kind==="me")continue;
+      if(filter){var o=N[i];var ok=o.kind==="kw"?o.n===filter:o.k.indexOf(filter)>=0;if(!ok)continue;}
+      var dx=sx[i]-e.clientX,dy=sy[i]-e.clientY,d=dx*dx+dy*dy;
+      if(d<bd){bd=d;best=i;}
+    }
+    if(best>=0)showCard(best);else hideCard();
+  }
+});
+canvas.addEventListener("wheel",function(e){if(mode!=="explore")return;e.preventDefault();zoom=Math.max(.6,Math.min(1.8,zoom*(e.deltaY>0?.95:1.05)));},{passive:false});
+
+window.addEventListener("resize",function(){resize();measure();});
+window.addEventListener("load",measure);
+resize();measure();
+requestAnimationFrame(frame);
+window.__proto={enter:enter,leave:leave,setF:function(f){filter=f;}};
+})();
+</script>
+</body>
+</html>
