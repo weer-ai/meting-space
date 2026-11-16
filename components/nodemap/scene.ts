@@ -16,12 +16,12 @@ import {
   WebGLRenderer,
 } from "three";
 import type { GNode, Graph } from "./graph";
-import { MAX_DUST, buildDust, buildTargets, createRandoms, makeRng, type Targets } from "./layout";
+import { MAX_DUST, STAGES, buildDust, buildMesh, buildTargets, createRandoms, makeRng, type Targets } from "./layout";
 
 /**
  * The home page 3D map. Ported from reference/meting-space-v9-node-map.html.
  *
- * What stays exactly as v9: six stages driven by scroll position (hold the first
+ * What stays exactly as v9: the stages driven by scroll position (hold the first
  * 45% of a section, morph through the last 55% with smoothstep), the glow-point
  * shader, warm dust with a few bokeh discs, curved filaments, DOM pill labels
  * projected every frame, and the explore mode (drag / zoom / tap / filter).
@@ -29,6 +29,15 @@ import { MAX_DUST, buildDust, buildTargets, createRandoms, makeRng, type Targets
  * What changed: npm three, deterministic layout, frame-rate independent easing,
  * measurement after fonts load and on resize, reduced-motion, visibility pause,
  * and a clean dispose().
+ *
+ * The story (approved 2026-11-16) has seven stages:
+ *   0 cover            a woven net of finished diversification around me/ting
+ *   1 what is happening  today's date in the middle, worries lighting up around it
+ *   2 the real problem   five separate baskets (one skill, one income, ...)
+ *   3 the idea           the baskets join up, the net forms
+ *   4 the method         six modules
+ *   5 meet your mentor   the evidence
+ *   6 closing            the net pulled tight around you
  */
 
 export type Mode = "story" | "explore";
@@ -90,16 +99,41 @@ const COL: Record<string, RGB> = {
   me: [1, 0.95, 0.9],
   red: [0.95, 0.45, 0.4],
   basket: [0.85, 0.62, 0.62],
+  worry: [0.8, 0.5, 0.48],
 };
 
-/** Edge brightness per stage (v9: .06 .12 .42 .24 .26 0). Stage 1 is nearly off so the baskets read as not connected. */
-const LINE_BASE = [0.06, 0.02, 0.42, 0.24, 0.26, 0];
+/**
+ * Edge brightness per stage: [structural edges (experience -> module), the woven mesh].
+ * Stages 1 and 2 are off on purpose: no net, nothing connects. It forms in stage 3.
+ */
+const EDGE_K: [number, number][] = [
+  [0.22, 0.3], // 0 cover: the net
+  [0, 0], //      1 what is happening
+  [0, 0], //      2 the real problem
+  [0.42, 0.16], // 3 the idea: it forms
+  [0.28, 0.12], // 4 the method
+  [0.26, 0.1], //  5 meet your mentor
+  [0.14, 0.3], //  6 closing: pulled tight
+];
+const EXPLORE_K: [number, number] = [0.6, 0.1];
+const WORRIES_AT_ONCE = 3;
 
 export function createScene(o: SceneOptions): SceneController | null {
   const { canvas, labels: labBox, graph: G } = o;
   const N = G.nodes;
   const NN = N.length;
   const E = G.edges;
+  const MESH = buildMesh(G);
+  const EN = E.length + MESH.length;
+  const EP = new Int32Array(EN);
+  const EQ = new Int32Array(EN);
+  for (let e = 0; e < EN; e++) {
+    const pair = e < E.length ? E[e] : MESH[e - E.length];
+    EP[e] = pair[0];
+    EQ[e] = pair[1];
+  }
+  /** The date the visitor opens the page on: the middle node of "What is happening?". */
+  const DATE = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   // Match the v9 look (it was built on three r128, which did no colour management).
   ColorManagement.enabled = false;
@@ -122,7 +156,7 @@ export function createScene(o: SceneOptions): SceneController | null {
   scene.add(root);
 
   /* ---------------- layout state ---------------- */
-  const rand = createRandoms(NN, E.length);
+  const rand = createRandoms(NN, EN);
   const DN = Math.min(window.innerWidth < 700 ? 900 : 1600, MAX_DUST);
   let vw = 1;
   let vh = 1;
@@ -177,8 +211,8 @@ export function createScene(o: SceneOptions): SceneController | null {
 
   const SEG = 10;
   const lineGeo = new BufferGeometry();
-  const lpAttr = new BufferAttribute(new Float32Array(E.length * SEG * 6), 3);
-  const lcAttr = new BufferAttribute(new Float32Array(E.length * SEG * 6), 3);
+  const lpAttr = new BufferAttribute(new Float32Array(EN * SEG * 6), 3);
+  const lcAttr = new BufferAttribute(new Float32Array(EN * SEG * 6), 3);
   lpAttr.setUsage(DynamicDrawUsage);
   lcAttr.setUsage(DynamicDrawUsage);
   lineGeo.setAttribute("position", lpAttr);
@@ -243,22 +277,59 @@ export function createScene(o: SceneOptions): SceneController | null {
   };
   N.forEach((n, i) => {
     const d = document.createElement("div");
-    d.className = "lab" + (n.kind === "module" || n.kind === "theme" ? " kw" : "") + (n.kind === "me" ? " me" : "");
+    d.className =
+      "lab" +
+      (n.kind === "module" || n.kind === "pillar" ? " kw" : "") +
+      (n.kind === "me" ? " me" : "") +
+      (n.kind === "worry" ? " worry" : "");
     d.textContent = n.name;
     labTxt[i] = n.name;
     labBox.appendChild(d);
     labEl[i] = d;
   });
 
-  /** Which nodes carry a label in each story stage. */
-  const LAB: Set<number>[] = [
-    new Set([G.ME]),
-    new Set(G.themes),
-    new Set(G.themes),
-    new Set(G.modules),
-    new Set(G.exps.filter((i) => N[i].proof)),
-    new Set([G.ME]),
-  ];
+  /* ---------------- which nodes carry a label, and what it says ---------------- */
+  /** Worry nodes currently lit (node index -> time in seconds when it goes dark again). */
+  const worryOn = new Map<number, number>();
+  let nextWorry = 0;
+
+  const labelled = (i: number, st: number): boolean => {
+    const n = N[i];
+    switch (n.kind) {
+      case "me": return st === 0 || st === 1 || st === 6;
+      case "pillar": return st === 0 || st === 2 || st === 3;
+      case "module": return st === 4;
+      case "exp": return st === 5 && n.proof;
+      case "worry": return st === 1 && worryOn.has(i);
+    }
+  };
+  const textFor = (n: GNode, st: number): string => {
+    if (n.kind === "me") return st === 1 ? DATE : n.name;
+    if (n.kind === "pillar") return st === 2 ? n.concentrated! : st === 3 ? n.diversified! : n.name;
+    return n.name;
+  };
+
+  /** Keeps a few worries lit at a time, each for a couple of seconds, at random. */
+  function updateWorries(nowMs: number, on: boolean) {
+    if (!on) {
+      worryOn.clear();
+      nextWorry = 0;
+      return;
+    }
+    if (reduced) {
+      // reduced motion: nothing flashes, a fixed few stay lit
+      if (worryOn.size === 0) G.worries.slice(0, WORRIES_AT_ONCE + 1).forEach((i) => worryOn.set(i, Infinity));
+      return;
+    }
+    const t = nowMs * 0.001;
+    for (const [i, until] of worryOn) if (until < t) worryOn.delete(i);
+    if (worryOn.size < WORRIES_AT_ONCE && t >= nextWorry) {
+      const idle = G.worries.filter((i) => !worryOn.has(i));
+      const pick = idle[Math.floor(Math.random() * idle.length)];
+      worryOn.set(pick, t + 2.2 + Math.random() * 1.4);
+      nextWorry = t + 0.55 + Math.random() * 0.7;
+    }
+  }
 
   /* ---------------- state ---------------- */
   let mode: Mode = "story";
@@ -276,7 +347,8 @@ export function createScene(o: SceneOptions): SceneController | null {
   let lx = 0;
   let ly = 0;
   let zoom = 1;
-  let lineBase = 0.06;
+  let lineS = 0.22;
+  let lineM = 0.3;
   let redMix = 0;
   let lastDebug = -1;
 
@@ -309,14 +381,14 @@ export function createScene(o: SceneOptions): SceneController | null {
     return n.kind === "module" ? i === filter : n.kind === "exp" ? n.links.includes(filter) : false;
   };
 
-  function dimFor(n: GNode, stA: number, inLab: boolean) {
-    switch (stA) {
-      case 0: return n.kind === "me" ? 1 : 0.7;
-      case 1: return n.kind === "module" ? 0.4 : 1;
-      case 2: return n.kind === "module" ? 0.85 : 1;
-      case 3: return inLab ? 1 : 0.55;
-      case 4: return inLab ? 1 : 0.3;
-      default: return 0.8;
+  /** Brightness of a node in a story stage (worries are driven by updateWorries). */
+  function dimFor(n: GNode, st: number, inLab: boolean): number {
+    switch (n.kind) {
+      case "me": return [1, 1, 0, 0, 0, 0, 0.9][st];
+      case "pillar": return [0.9, 0, 1, 1, 0, 0, 0][st];
+      case "module": return [0.7, 0.4, 0.4, 0.85, 1, 0.3, 0.8][st];
+      case "exp": return [0.7, 0.5, 1, 1, 0.55, inLab ? 1 : 0.3, 0.8][st];
+      default: return 0;
     }
   }
 
@@ -361,11 +433,13 @@ export function createScene(o: SceneOptions): SceneController | null {
       exploreK += ((ex ? 1 : 0) - exploreK) * kx;
     }
 
-    let a = clamp(Math.floor(stageF), 0, 4);
-    let b = Math.min(5, a + 1);
+    const LAST = STAGES - 1;
+    let a = clamp(Math.floor(stageF), 0, LAST - 1);
+    let b = Math.min(LAST, a + 1);
     let f = ease(stageF - a);
-    if (stageF >= 5) { a = 5; b = 5; f = 0; }
-    const stA = clamp(Math.round(stageF), 0, 5);
+    if (stageF >= LAST) { a = LAST; b = LAST; f = 0; }
+    const stA = clamp(Math.round(stageF), 0, LAST);
+    updateWorries(now, stA === 1 && !ex);
     const A = NT.stage[a];
     const B = NT.stage[b];
     const X = NT.explore;
@@ -390,22 +464,24 @@ export function createScene(o: SceneOptions): SceneController | null {
       cur[j + 2] = np[j + 2] = z;
 
       const n = N[i];
-      const inLab = LAB[stA].has(i);
+      const inLab = !ex && labelled(i, stA);
+      const lit = n.kind === "worry" && worryOn.has(i);
       let aT: number;
       if (ex) {
         const on = filter !== null && !matches(i) ? 0.12 : 1;
-        aT = n.kind === "theme" ? 0 : on;
-      } else if (n.kind === "theme") aT = stA === 1 || stA === 2 ? 1 : 0;
-      else if (n.kind === "me") aT = stA === 0 || stA === 5 ? dimFor(n, stA, inLab) : 0;
+        aT = n.kind === "pillar" || n.kind === "worry" ? 0 : on;
+      } else if (n.kind === "worry") aT = stA === 1 ? (lit ? 1 : 0.22) : 0;
+      else if (n.kind === "me") aT = dimFor(n, stA, inLab);
       else aT = dimFor(n, stA, inLab);
 
-      const base = n.kind === "me" ? 30 : n.kind === "exp" ? 15 : 22;
-      const sT = base * (inLab && !ex ? 1.4 : 1) * (i === sel ? 1.7 : 1);
+      const base = n.kind === "me" ? 30 : n.kind === "exp" ? 15 : n.kind === "worry" ? 17 : 22;
+      const sT = base * (inLab ? 1.4 : 1) * (i === sel ? 1.7 : 1);
 
-      let c: RGB = COL[n.kind === "me" ? "me" : n.kind === "exp" ? "p" : "kw"];
-      if (stA === 1 && !ex) {
-        if (n.kind === "exp") c = COL.basket;
-        else if (n.kind === "theme") c = COL.red;
+      let c: RGB = n.kind === "me" ? COL.me : n.kind === "exp" ? COL.p : n.kind === "worry" ? (lit ? COL.red : COL.worry) : COL.kw;
+      if (!ex && stA === 1 && n.kind !== "me" && n.kind !== "worry") c = COL.basket;
+      if (!ex && stA === 2) {
+        if (n.kind === "pillar") c = COL.red;
+        else if (n.kind !== "me") c = COL.basket;
       }
 
       const snap = reduced ? 1 : k2;
@@ -428,7 +504,7 @@ export function createScene(o: SceneOptions): SceneController | null {
     const DA = reduced ? 0 : R * 0.025;
     const DA0 = DT[a];
     const DB = DT[b];
-    const DE = DT[2];
+    const DE = DT[3];
     const tq2 = now * 0.001;
     for (let j = 0; j < DN * 3; j++) {
       const v = lerp(DA0[j], DB[j], f);
@@ -442,31 +518,42 @@ export function createScene(o: SceneOptions): SceneController | null {
     (nodes.material as ShaderMaterial).uniforms.fade.value = fade;
     lineMat.opacity = fade;
 
-    // lines: soft curved filaments
+    // lines: soft curved filaments (structural edges) and the woven mesh of the net
     const lp = lpAttr.array as Float32Array;
     const lc = lcAttr.array as Float32Array;
-    const baseT = ex ? 0.6 : LINE_BASE[stA];
-    lineBase += (baseT - lineBase) * (reduced ? 1 : k2);
-    const redT = stA === 1 && !ex ? 1 : 0;
+    const kt = ex ? EXPLORE_K : EDGE_K[stA];
+    lineS += (kt[0] - lineS) * (reduced ? 1 : k2);
+    lineM += (kt[1] - lineM) * (reduced ? 1 : k2);
+    const redT = (stA === 1 || stA === 2) && !ex ? 1 : 0;
     redMix += (redT - redMix) * (reduced ? 1 : k2);
     const cr = lerp(1, 0.8, redMix);
     const cg = lerp(0.62, 0.5, redMix);
     const cb = lerp(0.5, 0.55, redMix);
     let w = 0;
-    for (let e = 0; e < E.length; e++) {
-      const p = E[e][0];
-      const q = E[e][1];
+    for (let e = 0; e < EN; e++) {
+      const mesh = e >= E.length;
+      const p = EP[e];
+      const q = EQ[e];
       const ax = cur[p * 3], ay = cur[p * 3 + 1], az = cur[p * 3 + 2];
       const bx = cur[q * 3], by = cur[q * 3 + 1], bz = cur[q * 3 + 2];
       const len = Math.hypot(bx - ax, by - ay, bz - az);
       const ow = rand.bow[e];
-      const sway = reduced ? 1 : 1 + 0.15 * Math.sin(tq * 0.8 + e);
-      const cx = (ax + bx) / 2 + ow[0] * len * 0.45 * sway;
-      const cy = (ay + by) / 2 + ow[1] * len * 0.45 * sway;
-      const cz = (az + bz) / 2 + ow[2] * len * 0.45 * sway;
-      let k = lineBase;
-      if (ex && filter !== null) k = q === filter ? 1 : 0.04;
-      if (ex && sel >= 0) k = p === sel || q === sel ? 1 : k * 0.4;
+      // structural edges bow like loose threads, the mesh stays taut
+      const bow = mesh ? 0.1 : 0.45;
+      const sway = reduced ? 1 : 1 + (mesh ? 0.05 : 0.15) * Math.sin(tq * 0.8 + e);
+      const cx = (ax + bx) / 2 + ow[0] * len * bow * sway;
+      const cy = (ay + by) / 2 + ow[1] * len * bow * sway;
+      const cz = (az + bz) / 2 + ow[2] * len * bow * sway;
+      let k = mesh ? lineM : lineS;
+      if (ex) {
+        if (!mesh) {
+          if (filter !== null) k = q === filter ? 1 : 0.04;
+          if (sel >= 0) k = p === sel || q === sel ? 1 : k * 0.4;
+        } else {
+          if (filter !== null) k *= 0.2;
+          if (sel >= 0) k *= p === sel || q === sel ? 3 : 0.5;
+        }
+      }
       for (let sg = 0; sg <= SEG; sg++) {
         const u = sg / SEG;
         const m = 1 - u;
@@ -520,17 +607,19 @@ export function createScene(o: SceneOptions): SceneController | null {
         if (filter !== null) show = matches(i) && n.kind !== "me" ? 1 : 0;
         else show = n.kind === "module" || i === sel ? 1 : 0;
         if (i === sel) show = 1;
-        if (n.kind === "me" || n.kind === "theme") show = 0;
-      } else show = LAB[stA].has(i) ? 1 : 0;
+        if (n.kind === "me" || n.kind === "pillar" || n.kind === "worry") show = 0;
+      } else show = labelled(i, stA) ? 1 : 0;
       const depthFade = ex ? Math.max(0.35, 1 - (v3.z - 0.9) * 6) : 1;
       const target = show ? Math.min(1, depthFade) : 0;
       labA[i] += (target - labA[i]) * (reduced ? 1 : k2);
       labY[i] = Y2 - 8;
-      if (n.kind === "theme") {
-        const txt = stA === 2 ? n.diversified! : n.concentrated!;
+      if (n.kind === "me" || n.kind === "pillar") {
+        const txt = textFor(n, stA);
         if (labTxt[i] !== txt) {
           labTxt[i] = txt;
           labEl[i].textContent = txt;
+          // the date in the middle of "What is happening?" is the main picture of that stage
+          if (n.kind === "me") labEl[i].classList.toggle("date", stA === 1);
           labW[i] = 0;
         }
       }
@@ -613,7 +702,7 @@ export function createScene(o: SceneOptions): SceneController | null {
       let bd = 34 * 34;
       for (let i = 0; i < NN; i++) {
         const n = N[i];
-        if (!sv[i] || n.kind === "me" || n.kind === "theme") continue;
+        if (!sv[i] || n.kind === "me" || n.kind === "pillar" || n.kind === "worry") continue;
         if (!matches(i)) continue;
         const dx = sx[i] - e.clientX;
         const dy = sy[i] - e.clientY;
@@ -667,7 +756,7 @@ export function createScene(o: SceneOptions): SceneController | null {
     },
     setFilter(m) { filter = m; },
     setSelected(i) { sel = i; },
-    setReducedMotion(b) { reduced = b; if (b) { vY = 0; shownStage = Math.round(stageF); } },
+    setReducedMotion(b) { reduced = b; worryOn.clear(); if (b) { vY = 0; shownStage = Math.round(stageF); } },
     measure,
     dispose() {
       disposed = true;

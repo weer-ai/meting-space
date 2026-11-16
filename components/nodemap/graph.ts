@@ -1,22 +1,23 @@
-import { EXPERIENCES, MODULES, type Group } from "@/data/nodes";
-import { ME_LABEL, THEMES } from "@/data/story";
+import { EXPERIENCES, MODULES, type Pillar } from "@/data/nodes";
+import { ME_LABEL, PILLARS, WORRIES } from "@/data/story";
 
-export type NodeKind = "me" | "theme" | "module" | "exp";
+export type NodeKind = "me" | "pillar" | "module" | "exp" | "worry";
 
 export type GNode = {
   i: number;
   id: string;
   kind: NodeKind;
-  /** Display name (card title, label). */
+  /** Display name (card title, default label). */
   name: string;
-  group: Group;
+  /** Experiences and pillar nodes only. */
+  pillar: Pillar | null;
   year?: string;
   text: string;
   proof: boolean;
   tbd: boolean;
   /** Connected node indexes: experience -> its modules, module -> its experiences. */
   links: number[];
-  /** Theme nodes: label per stage. */
+  /** Pillar nodes: label per stage. */
   concentrated?: string;
   diversified?: string;
 };
@@ -26,48 +27,34 @@ export type Graph = {
   /** [experience, module] pairs. */
   edges: [number, number][];
   ME: number;
-  themes: number[];
+  pillars: number[];
   modules: number[];
   exps: number[];
+  worries: number[];
+  /** The woven net on the cover and in the closing: pillars, modules and experiences (not the worries). */
+  net: number[];
 };
 
-/** Order matters for layout seeds: me, themes, modules, experiences. */
+/** Order matters for layout seeds: me, pillars, modules, experiences, worries. */
 export function buildGraph(): Graph {
   const nodes: GNode[] = [];
   const push = (n: Omit<GNode, "i" | "links">): number => {
     nodes.push({ ...n, i: nodes.length, links: [] });
     return nodes.length - 1;
   };
+  const blank = { text: "", proof: false, tbd: false };
 
-  const ME = push({ id: "me", kind: "me", name: ME_LABEL, group: "free", text: "", proof: false, tbd: false });
-  const themes = THEMES.map((t) =>
-    push({
-      id: t.id,
-      kind: "theme",
-      name: t.concentrated,
-      group: t.group,
-      text: "",
-      proof: false,
-      tbd: false,
-      concentrated: t.concentrated,
-      diversified: t.diversified,
-    }),
+  const ME = push({ id: "me", kind: "me", name: ME_LABEL, pillar: null, ...blank });
+  const pillars = PILLARS.map((p) =>
+    push({ id: p.id, kind: "pillar", name: p.name, pillar: p.pillar, ...blank, concentrated: p.concentrated, diversified: p.diversified }),
   );
   const modules = MODULES.map((m) =>
-    push({ id: `module-${m.name}`, kind: "module", name: m.name, group: "free", text: m.text, proof: false, tbd: false }),
+    push({ id: `module-${m.name}`, kind: "module", name: m.name, pillar: null, text: m.text, proof: false, tbd: false }),
   );
   const exps = EXPERIENCES.map((e) =>
-    push({
-      id: e.id,
-      kind: "exp",
-      name: e.name,
-      group: e.group,
-      year: e.year,
-      text: e.text,
-      proof: !!e.proof,
-      tbd: !!e.tbd,
-    }),
+    push({ id: e.id, kind: "exp", name: e.name, pillar: e.pillar, year: e.year, text: e.text, proof: !!e.proof, tbd: !!e.tbd }),
   );
+  const worries = WORRIES.map((w, k) => push({ id: `worry-${k}`, kind: "worry", name: w, pillar: null, ...blank }));
 
   const edges: [number, number][] = [];
   EXPERIENCES.forEach((e, k) => {
@@ -80,5 +67,5 @@ export function buildGraph(): Graph {
     });
   });
 
-  return { nodes, edges, ME, themes, modules, exps };
+  return { nodes, edges, ME, pillars, modules, exps, worries, net: [...pillars, ...modules, ...exps] };
 }

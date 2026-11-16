@@ -33,7 +33,7 @@ const VIEWPORTS = {
   mobile: { width: 390, height: 844, isMobile: true, hasTouch: true },
   desktop: { width: 1440, height: 900 },
 };
-const NAMES = ["0-cover", "1-why-now", "2-idea", "3-agenda", "4-why-me", "5-closing"];
+const NAMES = ["0-cover", "1-happening", "2-problem", "3-idea", "4-method", "5-mentor", "6-closing"];
 
 (async () => {
   await new Promise((r) => server.listen(0, r));
@@ -80,7 +80,7 @@ const NAMES = ["0-cover", "1-why-now", "2-idea", "3-agenda", "4-why-me", "5-clos
     ];
     for (const [label, y] of closing) {
       await page.evaluate((y) => window.scrollTo(0, y), y);
-      await settle(last, path.join(OUT, `${vname}-5-closing-${label}.png`));
+      await settle(last, path.join(OUT, `${vname}-${last}-closing-${label}.png`));
     }
 
     // explore mode, via the deep link used by /minutes

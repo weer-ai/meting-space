@@ -1,22 +1,44 @@
 /**
- * Story-level nodes for the home page 3D map (DESIGN-BRIEF.md §2).
- * The three theme nodes only show in stage 1 (concentrated bets) and
- * stage 2 (same nodes, relabelled); their alpha is 0 in every other stage.
+ * Story-level nodes for the home page 3D map. Copy approved by Ting on 2026-11-16
+ * (also written into CONTENT.md, which tests/copy.test.ts checks).
  */
-import type { Group } from "./nodes";
+import type { Pillar } from "./nodes";
 
-export const THEMES: {
+/**
+ * The five pillars. Each is one node on the map:
+ *  - `name`         the net on the cover (stage 0)
+ *  - `concentrated` a basket that holds only one thing (stage 2, "The real problem")
+ *  - `diversified`  the same node once it is spread out (stage 3, "The idea")
+ */
+export const PILLARS: {
   id: string;
-  group: Exclude<Group, "free">;
-  /** Label in stage 1 (Why now). */
+  pillar: Pillar;
+  name: string;
   concentrated: string;
-  /** Label in stage 2 (The idea). */
   diversified: string;
 }[] = [
-  { id: "theme-skill", group: "skill", concentrated: "One skill", diversified: "Stacked skills" },
-  { id: "theme-income", group: "income", concentrated: "One income", diversified: "More than one income" },
-  { id: "theme-place", group: "place", concentrated: "One place", diversified: "More than one place" },
+  { id: "pillar-skill", pillar: "skill", name: "Skills", concentrated: "One skill", diversified: "Stacked skills" },
+  { id: "pillar-income", pillar: "income", name: "Income", concentrated: "One income", diversified: "More than one income" },
+  { id: "pillar-place", pillar: "place", name: "Places", concentrated: "One place", diversified: "More than one place" },
+  { id: "pillar-people", pillar: "people", name: "People", concentrated: "One circle", diversified: "More than one circle" },
+  { id: "pillar-money", pillar: "money", name: "Money", concentrated: "One pot", diversified: "More than one pot" },
 ];
 
-/** The me/ting centre node label (stages 0 and 5). */
+/**
+ * What keeps people up at night right now. In "What is happening?" these nodes
+ * take turns lighting up around today's date.
+ */
+export const WORRIES = [
+  "Inflation",
+  "AI",
+  "Robots taking jobs",
+  "Layoffs",
+  "Job hunting",
+  "Can't keep up",
+  "Rising rent",
+  "Stale skills",
+  "Borders and visas",
+] as const;
+
+/** The me/ting centre node label (cover and closing). In "What is happening?" it shows today's date instead. */
 export const ME_LABEL = "me/ting";

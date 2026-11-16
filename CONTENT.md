@@ -2,6 +2,8 @@
 
 Nov 16, 2026 · @Ting
 
+> **v2（2026-11-16）**：首頁改成七拍故事線（What is happening → The real problem → The idea → The method → Meet your mentor）。首頁英文文案以本檔為準；`/cohort`、`/minutes` 暫時維持 v1，之後再對齊（見「待確認事項」）。
+
 ## 給開發者的摘要
 
 meting space 從「航空體驗顧問」網站改為人生設計網站：用設計師的方法論，教人把自己當公司經營。網站的唯一主要行動是**加入第一期 cohort 的候補名單**。
@@ -21,24 +23,26 @@ meting space 從「航空體驗顧問」網站改為人生設計網站：用設�
 
 | 路徑 | 頁面 | 目的 | 主要行動 |
 | --- | --- | --- | --- |
-| `/` | Home | 說清楚概念、為什麼是我、六個議程 | 加入候補名單 |
+| `/` | Home | 說清楚概念：時代在變、真正的問題、方法、為什麼是我 | 加入候補名單 |
 | `/cohort` | The Board（第一期 cohort） | 六週內容、形式、適合誰、FAQ | 加入候補名單 |
 | `/minutes` | About／證據 | 五個跨界維度、獲獎與專利、3D 節點圖全螢幕探索 | 加入候補名單 |
 | `/log` | Build in public 日誌 | 用這套系統撐過 Weer 兩年的紀錄 | 訂閱（同一份名單） |
 
 另加 `/zh/cohort`：Cohort 頁的繁中版，用來測中文市場（台灣與華語圈）。內容與英文版相同，表單共用同一份名單，以 `lang=zh` 標記。中文文案等英文版定稿後再寫。
 
-**首頁段落順序**
+**首頁段落順序**（七拍；起點與終點都是那張「保護網」）
 
-1. Cover：一句話概念＋候補名單按鈕，3D 節點圖在背景
-2. (01) Why now：變動時代裡，單一技能、單一收入、單一國家是集中押注
-3. (02) The idea：把人生當公司——五個公司職能對應五個人生問題
-4. (03) The agenda：六個模組預覽，連到 `/cohort`
-5. (04) Why me：我是第一個用戶，五個跨界維度摘要，連到 `/minutes`
-6. (05) From the log：最新 2–3 篇日誌
-7. Closing：候補名單表單（深色區塊）
+1. Cover：破題＋候補名單按鈕。3D 背景是一張已經織好的網（各種已完成的分散佈局）包住 `me/ting`
+2. (01) What is happening?：中心節點是訪客當天的日期，周圍節點輪流閃出這個時代的焦慮
+3. (02) The real problem：只押在一個支點上——One skill、One income、One place、One circle、One pot
+4. (03) The idea：用經營公司的方法經營人生（公司 vs 人生對照）
+5. (04) The method：六個工具，每週一個，連到 `/cohort`
+6. (05) Meet your mentor：我是第一個用戶，依五個支柱列事證，連到 `/minutes`
+7. Closing：候補名單表單（深色區塊）。有已發佈的日誌時，在標題下方列 (06) From the log 最新 2–3 篇
 
 footer：email、LinkedIn、「For teams and talks」一行連結、財稅免責聲明。
+
+**五個支柱**（網的結構，也是 (02) 的五個籃子、(05) 的五個段落）：Skills、Income、Places、People、Money。Flag theory（分散居住、收入、資產所在地）屬於 Places 與 Money；Five friends 屬於 People。
 
 ## 首頁文案
 
@@ -47,31 +51,37 @@ footer：email、LinkedIn、「For teams and talks」一行連結、財稅免責
 ### Cover
 
 - Eyebrow（小字，在 headline 上方）：*Hi, nice me(e)ting you.*
-- Headline：**The world is changing faster than any single career. Go long on yourself.**
-- Sub-line：*Stack your skills, build more than one line, spread your risk, and let your life compound. A six-week life-design cohort by someone who runs her own life this way.*
-- CTA：**Join the waitlist** · 次要連結 *Why now ↓*
+- Headline：**The world now moves faster than any career. Go long on yourself.**
+- Sub-line：*Skills, income, places and people that hold each other up, like a net. A six-week life-design cohort by someone who runs her own life this way.*
+- CTA：**Join the waitlist** · 次要連結 *What is happening ↓*
 
-（這個世界變得比任何一種職涯都快。做多你自己：疊加能力、多方佈局、分散風險，讓人生長期看漲。「Go long」是投資用語的「做多、長期看漲」，剛好接上後面的 Fund 與 Resilience 模組。）
+（這個世界現在比任何一種職涯都快。做多你自己。「Go long」是投資用語的「做多、長期看漲」，剛好接上後面的 Fund 與 Resilience。背景那張網就是承諾：技能、收入、地方、人脈彼此撐住。）
 
-備選 headline，給你挑：
+### (01) What is happening?
 
-1. **In an age of constant change, the safest bet is you, diversified.**
-2. **One skill, one job, one country is a concentrated bet. Diversify your life.**
-3. **Don't predict the future. Be ready for several of them.**
+**Lead:** Prices rise. AI learns your job. Teams get cut. Every week there is something new you are meant to keep up with.
 
-### (01) Why now: the safe path became the risky one
+**Result line:** You are not falling behind. The ground is moving.
+
+3D：中心節點顯示訪客當天的日期，周圍節點輪流閃出下列標籤（一次亮 3 個、各亮約 2–3 秒）：Inflation · AI · Robots taking jobs · Layoffs · Job hunting · Can't keep up · Rising rent · Stale skills · Borders and visas
+
+（開啟「減少動態」時不閃，固定亮其中幾個；沒有 WebGL 時，這幾個詞以文字標籤列出。）
+
+### (02) The real problem
 
 **Lead:** For decades the safe plan was one skill, one employer, one country. In a decade of AI, restructuring and borders that open and close, that plan is a concentrated bet.
 
 1. **One skill.** A single skill can be automated or outsourced. A combination of skills is much harder to replace.
 2. **One income.** When one paycheque carries rent, savings and every plan, one decision by someone else can stop all of it.
 3. **One place.** Your career, money and residency all sit under one country's rules and one market's cycle.
+4. **One circle.** When everyone around you works in the same field and thinks the same way, nobody warns you.
+5. **One pot.** All your money in one currency, one bank, one asset.
 
 **Result line:** You would never put your whole portfolio in one stock. Most of us put our whole life in one.
 
-**Bridge line（接到 02）：** The answer is not to predict the future. It is to be positioned for several of them.
+**Bridge line（接到 03）：** The answer is not to predict the future. It is to be positioned for several of them.
 
-### (02) The idea
+### (03) The idea: run your life like a company
 
 **Lead:** Diversify like an investor, operate like a company. A company has a mission, a product line, a CFO, a talent plan and an R&D budget. Your life can too.
 
@@ -82,48 +92,69 @@ footer：email、LinkedIn、「For teams and talks」一行連結、財稅免責
 | A CFO | A runway you know to the month |
 | A talent plan | An environment that makes you grow |
 | R&D | Small, cheap experiments before big moves |
+| A board | Five people who tell you the truth |
+| A risk register | Risk spread across places and assets |
 
 **Line under table:** I am not a coach with a motivational script. I am a designer who applied the same methods to her own life, and kept the receipts.
 
-### (03) The agenda
+### (04) The method
 
-**Lead:** Six sessions, one per week. Each one ends with a decision, not a mood.
+**Lead:** Six tools, one per week. Each one ends with a decision, not a mood.
 
-六張卡片，編號 (01)–(06)，每張一個動詞加一句話：
+六張卡片，編號 (01)–(06)，每張一個工具加一句話，並標出它屬於哪個模組：
 
-1. **Discover** — See where you really stand: skills, assets, money, energy.
-2. **Define** — Design the life you want, and measure the gap.
-3. **Prototype** — Test the new life in small, cheap experiments.
-4. **Fund** — Make the experiments affordable: spending, runway, income curves.
-5. **Environment** — Put yourself where growth happens on its own.
-6. **Resilience** — Spread your risk across places, income and assets.
+| Tool | Module | One line |
+| --- | --- | --- |
+| **Ikigai** | Discover | See where you really stand: skills, assets, money, energy. |
+| **Design thinking** | Define | Design the life you want, and measure the gap. |
+| **Prototyping** | Prototype | Test the new life in small, cheap experiments. |
+| **Runway** | Fund | Make the experiments affordable: spending, runway, income curves. |
+| **Five friends** | Environment | Put yourself where growth happens on its own. The five people around you set your normal. Choose them on purpose. |
+| **Flag theory** | Resilience | Spread your risk across places, income and assets. |
 
 CTA：*See the full agenda →* `/cohort`
 
-### (04) Why me
+### (05) Meet your mentor
 
 **Lead:** I am the first client of this method. Fifteen years, five countries, three kinds of work, and one rule: design it, test it, then commit.
 
-- **Four curves.** Design, business, money and AI building, each learned on the job.
-- **Five countries.** Taiwan, Germany, the Netherlands, the US and Singapore.
-- **Three ways of working.** Full-time, freelance and startups.
-- **Recognised in each role.** A US patent as a designer, Red Dot and Webby as a product team, awards as a founder.
+依五個支柱列事證。每個支柱一句話，下面接該支柱的所有經歷（名稱、年份、一句成果，文字出自 `DESIGN-BRIEF.md` 的節點表；尚未確認的以紅色 `[TBD]` 標示）：
+
+| Pillar | Line |
+| --- | --- |
+| Skills | Design, business, money and AI building, layered over fifteen years. |
+| Income | Full-time, freelance and startups. |
+| Places | Taiwan, Germany, the Netherlands, the US and Singapore. |
+| People | Put yourself where growth happens on its own. |
+| Money | Two years, no salary, by design. |
 
 **Right now:** I am building a startup with no salary for two years, and running this playbook in public so you can watch it work, or not.
 
 CTA：*Read the minutes →* `/minutes`
 
-### (05) From the log
+### (06) From the log
 
 **Lead:** The live case study. Real numbers, real decisions, including the ones that did not work.
 
-自動列出 `/log` 最新 3 篇（標題、日期、一句摘要）。
+自動列出 `/log` 最新 3 篇（標題、日期、一句摘要）。沒有已發佈的日誌就整塊不顯示。
 
 ### Closing（深色區塊）
 
 - Headline：**Take a seat at your own board.**
 - Body：*The first cohort is small on purpose. Join the waitlist and tell me where you are stuck. I read every answer.*
 - 表單欄位見「視覺與技術規格」。
+
+### 3D 節點圖上的標籤
+
+五個支柱節點在不同階段換字：封面是網的五個結構，(02) 是各自只有一個的籃子，(03) 是分散之後。
+
+| Cover | (02) The real problem | (03) The idea |
+| --- | --- | --- |
+| Skills | One skill | Stacked skills |
+| Income | One income | More than one income |
+| Places | One place | More than one place |
+| People | One circle | More than one circle |
+| Money | One pot | More than one pot |
 
 ### Footer
 
@@ -285,3 +316,5 @@ CTA：*Read the minutes →* `/minutes`
 - [ ] 第一期價格、人數、開課日、退款政策（Flight Plan 排在 2027 年 1 月決定）。
 - [ ] Email 工具選哪個。
 - [ ] 現有 3D 站的技術架構（框架、repo 位置），讓 Claude Code 知道從哪裡改。
+- [ ] **`/cohort` 對齊首頁新故事線（暫定，之後討論）**：六週標題要不要換成方法名（Ikigai、Design thinking、Prototyping、Runway、Five friends、Flag theory）、「Who it is for」與首頁的呼應。目前 `/cohort`、`/minutes` 維持 v1 文案。
+- [ ] 首頁 v2 新增、待你過目：五個支柱的歸屬（例如 Ikigai map 與 Industrial design 歸 Skills，TU Delft 歸 People）、三個我加的焦慮標籤（Rising rent、Stale skills、Borders and visas）。

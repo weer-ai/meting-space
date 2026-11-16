@@ -14,14 +14,17 @@ export type Module =
   | "Environment"
   | "Resilience";
 
-/** Stage 1 baskets: skill / income / place. "free" nodes float outside them. */
-export type Group = "skill" | "income" | "place" | "free";
+/**
+ * The five things to diversify. They are the baskets in "The real problem" and
+ * the sections of "Meet your mentor": skills, income, places, people, money.
+ */
+export type Pillar = "skill" | "income" | "place" | "people" | "money";
 
 export type ExperienceNode = {
   id: string;
   name: string;
   year?: string;
-  group: Group;
+  pillar: Pillar;
   /** Edges: experience -> module. */
   modules: Module[];
   text: string;
@@ -44,7 +47,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "industrial-design-taipei",
     name: "Industrial design, Taipei",
     year: "2010",
-    group: "place",
+    pillar: "skill",
     modules: ["Discover"],
     text: "BA Industrial Product Design, Shih Chien University.",
   },
@@ -52,7 +55,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "bmw-munich",
     name: "BMW, Munich",
     year: "2011",
-    group: "place",
+    pillar: "place",
     modules: ["Prototype", "Environment"],
     text: "Design internship bridging Chinese market design preferences.",
   },
@@ -60,7 +63,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "designit-munich",
     name: "Designit, Munich",
     year: "2011–12",
-    group: "place",
+    pillar: "place",
     modules: ["Prototype"],
     text: "Service design helping Western brands bridge into China.",
   },
@@ -68,7 +71,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "tu-delft",
     name: "TU Delft",
     year: "2013–15",
-    group: "place",
+    pillar: "people",
     modules: ["Environment", "Discover"],
     text: "MSc Integrated Product Design, 9/10.",
   },
@@ -76,7 +79,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "boeing-777x",
     name: "Boeing 777X",
     year: "2014–15",
-    group: "skill",
+    pillar: "skill",
     modules: ["Prototype", "Define"],
     text: "Galley workspace +60%, toilet legroom +6 cm. US patents for the cabin.",
     proof: true,
@@ -86,7 +89,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "accenture-interactive",
     name: "Accenture Interactive",
     year: "2016–21",
-    group: "skill",
+    pillar: "skill",
     modules: ["Prototype", "Environment"],
     text: "30+ design sprints, 10+ MVPs turned into full products.",
     proof: true,
@@ -95,7 +98,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "smartify",
     name: "Smartify",
     year: "2016–21",
-    group: "skill",
+    pillar: "skill",
     modules: ["Prototype"],
     text: "Webby Winner and People's Voice; GSMA GLOMO Most Innovative Mobile App.",
     proof: true,
@@ -105,7 +108,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "ai-building",
     name: "AI building",
     year: "2024–",
-    group: "skill",
+    pillar: "skill",
     modules: ["Prototype", "Define"],
     text: "Building Weer's product with AI coding tools.",
   },
@@ -113,7 +116,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "meting-experience-design",
     name: "meting experience design",
     year: "2021–",
-    group: "income",
+    pillar: "income",
     modules: ["Fund", "Resilience"],
     text: "Independent practice: Rituals, gategroup, Philips, InterContinental Amstel.",
   },
@@ -121,7 +124,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "rituals",
     name: "Rituals",
     year: "2021–",
-    group: "income",
+    pillar: "income",
     modules: ["Prototype"],
     text: "In-store sales +19%, membership sign-ups +14%.",
     proof: true,
@@ -130,7 +133,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "gategroup",
     name: "gategroup",
     year: "2021",
-    group: "income",
+    pillar: "income",
     modules: ["Prototype", "Resilience"],
     text: "A new digital business during COVID-19, $150M potential revenue.",
     proof: true,
@@ -139,7 +142,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "lufthansa-group",
     name: "Lufthansa Group",
     year: "2025",
-    group: "income",
+    pillar: "income",
     modules: ["Fund", "Prototype"],
     text: "Remote contract: product strategy across five airlines.",
     proof: true,
@@ -149,7 +152,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "weer",
     name: "Weer",
     year: "2023–",
-    group: "income",
+    pillar: "income",
     modules: ["Define", "Prototype", "Fund"],
     text: "Founder. Startupbootcamp Top 10; Erasmus Entrepreneurship fellow.",
     proof: true,
@@ -158,7 +161,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "life-ledger",
     name: "Life ledger",
     year: "2026",
-    group: "income",
+    pillar: "money",
     modules: ["Fund"],
     text: "The spreadsheet behind two years without a salary.",
     tbd: true, // how public?
@@ -167,7 +170,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "singapore-company",
     name: "Singapore company",
     year: "2023–",
-    group: "place",
+    pillar: "place",
     modules: ["Resilience"],
     text: "A company in one country, a life in another.",
     tbd: true, // how public?
@@ -176,7 +179,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "network-school",
     name: "Network School",
     year: "2026",
-    group: "place",
+    pillar: "people",
     modules: ["Environment"],
     text: "Joined a builder environment on purpose.",
   },
@@ -184,7 +187,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "terminal-taiwan",
     name: "Terminal Taiwan",
     year: "2026",
-    group: "place",
+    pillar: "people",
     modules: ["Environment", "Resilience"],
     text: "Started a community for international builders in Taiwan.",
   },
@@ -192,7 +195,7 @@ export const EXPERIENCES: ExperienceNode[] = [
     id: "ikigai-map",
     name: "Ikigai map",
     year: "2026",
-    group: "free",
+    pillar: "skill",
     modules: ["Discover", "Define"],
     text: "How I chose a direction.",
   },

@@ -63,6 +63,15 @@ const check = (name, ok, extra = "") => { results.push(ok); console.log(ok ? "PA
     await p.waitForTimeout(2500);
     const stage = await p.evaluate(() => document.documentElement.dataset.mapStage);
     check("reduced motion: stage snaps to a whole number", Number.isInteger(parseFloat(stage)), `(stage=${stage})`);
+    // "What is happening?" with reduced motion: a few worries stay lit, nothing flashes
+    const y1 = await p.evaluate(() => { const s = document.querySelectorAll("section.s")[1]; return s.getBoundingClientRect().top + scrollY; });
+    await p.evaluate((y) => scrollTo(0, y), y1);
+    await p.waitForTimeout(2500);
+    const litNow = () => p.evaluate(() => [...document.querySelectorAll("#labels .lab.worry")].filter((e) => parseFloat(e.style.opacity || "0") > 0.5).map((e) => e.textContent).sort().join("|"));
+    const l1 = await litNow();
+    await p.waitForTimeout(4000);
+    const l2 = await litNow();
+    check("reduced motion: worries do not flash (same few stay lit)", l1.split("|").length >= 3 && l1 === l2, `(${l1})`);
     await p.screenshot({ path: path.join(OUT, "reduced-motion-idea.png") });
     await b.close();
   }

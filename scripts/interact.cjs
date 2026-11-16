@@ -36,10 +36,24 @@ const check = (name, ok, extra = "") => { results.push(ok); console.log(ok ? "PA
     await p.waitForTimeout(1500);
 
     // anchors
-    await p.getByRole("link", { name: "Why now ↓" }).click();
+    await p.getByRole("link", { name: "What is happening ↓" }).click();
     await p.waitForTimeout(2500);
     const stageAfterAnchor = parseFloat(await p.evaluate(() => document.documentElement.dataset.mapStage));
-    check(`${label}: "Why now ↓" lands on stage 1`, Math.abs(stageAfterAnchor - 1) < 0.06, `(stage=${stageAfterAnchor})`);
+    check(`${label}: "What is happening ↓" lands on stage 1`, Math.abs(stageAfterAnchor - 1) < 0.06, `(stage=${stageAfterAnchor})`);
+    // "What is happening?": today's date in the middle, worries taking turns
+    await p.waitForTimeout(1500);
+    const seen = new Set();
+    let maxAtOnce = 0;
+    for (let k = 0; k < 24; k++) {
+      const lit = await p.evaluate(() => [...document.querySelectorAll("#labels .lab.worry")].filter((e) => parseFloat(e.style.opacity || "0") > 0.5).map((e) => e.textContent));
+      lit.forEach((t) => seen.add(t));
+      maxAtOnce = Math.max(maxAtOnce, lit.length);
+      await p.waitForTimeout(350);
+    }
+    const today = await p.evaluate(() => new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }));
+    const meText = await p.evaluate(() => { const e = document.querySelector("#labels .lab.me"); return e ? e.textContent : null; });
+    check(`${label}: the middle node shows today's date`, meText === today, `(label=${meText}, today=${today})`);
+    check(`${label}: worries take turns lighting up (saw ${seen.size} different, at most ${maxAtOnce} at once)`, seen.size >= 4 && maxAtOnce <= 4, `[${[...seen].join(", ")}]`);
     await p.evaluate(() => scrollTo(0, 0));
     await p.waitForTimeout(500);
 
@@ -114,7 +128,7 @@ const check = (name, ok, extra = "") => { results.push(ok); console.log(ok ? "PA
     await p.waitForTimeout(1200);
     await p.getByRole("link", { name: "See the full agenda →" }).click();
     await p.waitForURL("**/cohort");
-    check("nav: home -> /cohort via 'See the full agenda →'", (await p.locator("h1").textContent()) === "The Board · Cohort 01");
+    check("nav: home -> /cohort via 'See the full agenda →'", (await p.locator("h1").textContent()).replace(/\u00a0/g, " ") === "The Board · Cohort 01");
     check("nav: /cohort carries no 3D canvas", (await p.locator("#gl").count()) === 0);
     check("nav: week cards expand", await (async () => { const d = p.locator("details.week").first(); await d.locator("summary").click(); return d.evaluate((e) => e.open); })());
     await p.getByRole("link", { name: "The minutes" }).click();

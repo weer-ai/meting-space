@@ -5,7 +5,7 @@ import * as home from "@/content/copy/home";
 import * as cohort from "@/content/copy/cohort";
 import * as minutes from "@/content/copy/minutes";
 import { EXPERIENCES, MODULES } from "@/data/nodes";
-import { THEMES } from "@/data/story";
+import { PILLARS, WORRIES } from "@/data/story";
 
 /**
  * "English copy is copied verbatim" is enforced here: every string that ships
@@ -50,7 +50,7 @@ describe("page copy is verbatim from CONTENT.md", () => {
 
   it("italic spans are real substrings of their headline", () => {
     expect(home.cover.headline).toContain(home.cover.headlineEm);
-    expect(home.whyNow.title).toContain(home.whyNow.titleEm);
+    expect(home.idea.title).toContain(home.idea.titleEm);
   });
 
   it("every [TBD] placeholder CONTENT.md puts on /cohort is still there", () => {
@@ -77,17 +77,29 @@ describe("node data is verbatim from DESIGN-BRIEF.md", () => {
       if (e.year) expect(BRIEF).toContain(e.year);
     });
   }
-  for (const t of THEMES) {
-    it(`theme ${t.concentrated} / ${t.diversified}`, () => {
-      expect(BRIEF).toContain(`\`${t.concentrated}\``.replace(/`/g, ""));
-      expect(BRIEF).toContain(t.diversified);
+});
+
+describe("3D map labels are verbatim from CONTENT.md (v2 home story)", () => {
+  for (const p of PILLARS) {
+    it(`pillar ${p.name}: ${p.concentrated} / ${p.diversified}`, () => {
+      expect(CONTENT).toContain(p.name);
+      expect(CONTENT).toContain(p.concentrated);
+      expect(CONTENT).toContain(p.diversified);
     });
   }
+  for (const w of WORRIES) {
+    it(`worry ${w}`, () => {
+      expect(CONTENT).toContain(w);
+    });
+  }
+  it("the worries are listed together in CONTENT.md, in this order", () => {
+    expect(CONTENT).toContain(WORRIES.join(" · "));
+  });
 });
 
 describe("launch hygiene", () => {
   it("no internal notes or unverified numbers shipped in the node data", () => {
-    const blob = JSON.stringify({ EXPERIENCES, MODULES, THEMES, cohort, minutes });
+    const blob = JSON.stringify({ EXPERIENCES, MODULES, PILLARS, WORRIES, cohort, minutes, home });
     expect(blob).not.toMatch(/[一-鿿]/); // no Chinese internal notes
     expect(blob).not.toMatch(/\+12%|\+18%|18 airlines|P\d{1,2}\)/);
     expect(blob).not.toMatch(/\b7 patents?\b|\bseven patents?\b/i);
