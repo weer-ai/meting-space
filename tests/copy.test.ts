@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import * as home from "@/content/copy/home";
+import * as cohort from "@/content/copy/cohort";
+import * as minutes from "@/content/copy/minutes";
 import { EXPERIENCES, MODULES } from "@/data/nodes";
 import { THEMES } from "@/data/story";
 
@@ -29,22 +31,36 @@ function strings(value: unknown, out: string[] = []): string[] {
   return out;
 }
 
-describe("home copy is verbatim from CONTENT.md", () => {
-  for (const [section, value] of Object.entries(home)) {
-    describe(section, () => {
-      for (const s of strings(value)) {
-        // "(01)" style numbers are structure, not copy.
-        if (/^\(\d\d\)$/.test(s)) continue;
-        it(JSON.stringify(s.length > 70 ? s.slice(0, 70) + "…" : s), () => {
-          expect(CONTENT).toContain(norm(s));
-        });
-      }
-    });
+const pages = { home, cohort, minutes };
+
+describe("page copy is verbatim from CONTENT.md", () => {
+  for (const [file, mod] of Object.entries(pages)) {
+    for (const [section, value] of Object.entries(mod)) {
+      describe(`${file}.${section}`, () => {
+        for (const s of strings(value)) {
+          // "(01)" style numbers are structure, not copy.
+          if (/^\(\d\d\)$/.test(s)) continue;
+          it(JSON.stringify(s.length > 70 ? s.slice(0, 70) + "…" : s), () => {
+            expect(CONTENT).toContain(norm(s));
+          });
+        }
+      });
+    }
   }
 
   it("italic spans are real substrings of their headline", () => {
     expect(home.cover.headline).toContain(home.cover.headlineEm);
     expect(home.whyNow.title).toContain(home.whyNow.titleEm);
+  });
+
+  it("every [TBD] placeholder CONTENT.md puts on /cohort is still there", () => {
+    const text = strings(cohort).join(" ");
+    expect(text).toContain("Small group [TBD]");
+    expect(text).toContain("Starts [TBD]");
+    expect(text).toContain("Recordings for those in other time zones [TBD]");
+    expect(text).toContain("[month TBD]");
+    expect(cohort.faq.items.find((i) => i.q.startsWith("What does it cost"))!.a).toContain("[TBD]");
+    expect(cohort.faq.items.find((i) => i.q.startsWith("What if it is not"))!.a).toBe("[TBD]");
   });
 });
 
@@ -71,8 +87,9 @@ describe("node data is verbatim from DESIGN-BRIEF.md", () => {
 
 describe("launch hygiene", () => {
   it("no internal notes or unverified numbers shipped in the node data", () => {
-    const blob = JSON.stringify({ EXPERIENCES, MODULES, THEMES });
+    const blob = JSON.stringify({ EXPERIENCES, MODULES, THEMES, cohort, minutes });
     expect(blob).not.toMatch(/[一-鿿]/); // no Chinese internal notes
     expect(blob).not.toMatch(/\+12%|\+18%|18 airlines|P\d{1,2}\)/);
+    expect(blob).not.toMatch(/\b7 patents?\b|\bseven patents?\b/i);
   });
 });

@@ -97,6 +97,7 @@ npm test             # vitest：文案逐字比對 + 佈局確定性
 node scripts/shots.cjs --out DIR --dpr 2 --pos top     # 手機390／桌機1440 截圖（需先 build）
 node scripts/interact.cjs                              # 探索模式、點擊、鍵盤、錨點
 node scripts/states.cjs --out DIR                      # reduced-motion、WebGL 失敗
+node scripts/pages.cjs --out DIR --dpr 2               # /cohort /minutes /log 整頁截圖，檢查溢出與 console 錯誤
 ```
 
 無頭 Chromium 要帶 swiftshader 參數才有 WebGL（腳本已處理）。
@@ -109,6 +110,17 @@ node scripts/states.cjs --out DIR                      # reduced-motion、WebGL 
 - `data/nodes.ts`（節點，逐字出自 Brief）、`data/story.ts`（三個主題節點與兩種標籤）。
 - `components/nodemap/`：`graph.ts`（資料→節點與連線）、`layout.ts`（純函式、確定性佈局）、`scene.ts`（three 場景與互動）。
 - `components/home/`：`HomeStory`（六段落，server）、`HomeShell`（client，持有 canvas 與模式）、`ExploreUI`、`WaitlistForm`。
+- 內頁：`app/cohort`、`app/minutes`、`app/log`、`app/log/[slug]`；文案在 `content/copy/cohort.ts`、`minutes.ts`（同樣逐字比對）；樣式在 `styles/pages.css`；`components/Rich.tsx` 把文案裡的 `[TBD]` 轉成紅色標籤；`components/page/LogList.tsx` 是依 module 篩選的日誌列表。
+- 日誌：`lib/log.ts` 讀 `content/log/*.md`（`draft: true` 不會出現在任何地方；缺 title／date／module 會讓 build 失敗而不是半成品上線；module 可寫名稱或 1–6）。`lib/markdown.ts` 渲染並 sanitize。測試與預覽可用環境變數 `LOG_DIR` 指到別的資料夾（`tests/fixtures/log`），**不要把假文章放進 `content/log`**。
+
+### 內頁規則
+
+- 內頁沿用暗色視覺，**不載 3D**（`scripts/pages.cjs` 會檢查沒有 `#gl`）。不要在內頁用 `section.s`（那是首頁階段的 class）。
+- 候補名單表單只在首頁 Closing。內頁的「Join the waitlist」都連到 `/#waitlist`。
+- Footer 導覽的 `/log` 連結只在有已發佈文章時顯示，與首頁 (05) 同一個規則。沒有文章時 `/log` 只有標題、lead 與 CTA，不編造內容。
+- `output: "export"` 不接受空的 `generateStaticParams`：沒有文章時 `/log/[slug]` 會產出一個不收錄、不被連結的佔位頁 `/log/_`，造訪時轉到 `/log`；有第一篇文章後自動消失。
+- `[TBD]` 一律用 `Rich` 渲染。CONTENT.md 的「[TBD 退款政策]」只上線 `[TBD]`（中文是給 Ting 的備註）。
+- 「Teams and talks → email」照 CONTENT.md 逐字上線，待 Ting 確認「email」是否只是連結去向的備註。
 
 ### 這輪定下的規則
 
@@ -123,7 +135,7 @@ node scripts/states.cjs --out DIR                      # reduced-motion、WebGL 
 
 ## 工作流程
 
-- 開發 branch：`claude/gracious-allen-o3kejp`。不經 Ting 要求不開 PR、不推其他 branch。階段 A（首頁）已完成並待 Ting 確認截圖。
+- 開發 branch：`claude/gracious-allen-o3kejp`。不經 Ting 要求不開 PR、不推其他 branch。階段 A（首頁）與階段 B（`/cohort`、`/minutes`、`/log`）已完成；表單接線（階段 C）待做。**推 `main` 會直接更新正式網站（Vercel Production），只有 Ting 明說 merge 才推。**
 - 順序：先首頁（3D 節點圖＋六段落）→ 截圖給 Ting 確認 → 再做 `/cohort`、`/minutes`、`/log` → 最後接表單 → `/zh/cohort` 等 Ting 說可以才做。
 - 每個階段完成都要在**手機 390px 與桌機 1440px**各截一張圖檢查（Playwright 內建 Chromium；無頭模式要開 swiftshader 才有 WebGL），文字不可被節點蓋住；截圖給 Ting 看之後才往下做。
 - 收尾對照 Brief §6 驗收清單：六階段依序變形且每段停得住；階段 1 偏紅、階段 2 換字；探索模式全功能；resize 不跳位；reduced motion 與 WebGL 失敗有替代畫面；`[TBD]` 都是紅色標籤且無內部說明；Lighthouse 行動版效能 ≥ 80。

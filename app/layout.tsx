@@ -3,13 +3,14 @@ import "@fontsource-variable/fraunces/opsz.css";
 import "@fontsource-variable/fraunces/opsz-italic.css";
 import "@fontsource-variable/inter/index.css";
 import "../styles/global.css";
+import "../styles/pages.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { cover } from "@/content/copy/home";
 import { ui } from "@/content/copy/ui";
 
 export const metadata: Metadata = {
-  title: ui.brand,
+  title: { default: ui.brand, template: `%s · ${ui.brand}` },
   description: cover.headline,
 };
 

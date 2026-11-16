@@ -1,26 +1,14 @@
 "use client";
 
 import { useId } from "react";
+import Rich from "@/components/Rich";
 import { waitlist } from "@/content/copy/home";
-
-/** Splits "[price TBD]" out of a label so the placeholder renders red. */
-function Label({ text }: { text: string }) {
-  const m = text.match(/^(.*?)(\[[^\]]*TBD[^\]]*\])(.*)$/);
-  if (!m) return <>{text}</>;
-  return (
-    <>
-      {m[1]}
-      <span className="tbd-inline">{m[2]}</span>
-      {m[3]}
-    </>
-  );
-}
 
 function Radios({ name, label, options }: { name: string; label: string; options: string[] }) {
   return (
     <fieldset className="field">
       <legend>
-        <Label text={label} />
+        <Rich text={label} />
       </legend>
       <div className="opts">
         {options.map((o, i) => (

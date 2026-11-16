@@ -22,8 +22,9 @@ const server = http.createServer((req, res) => {
   let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
   if (p.endsWith("/")) p += "index.html";
   let f = path.join(ROOT, p);
-  if (!fs.existsSync(f) && fs.existsSync(f + ".html")) f += ".html";
-  if (!fs.existsSync(f)) { res.writeHead(404); return res.end("not found"); }
+  const isFile = (x) => fs.existsSync(x) && fs.statSync(x).isFile();
+  if (!isFile(f) && isFile(f + ".html")) f += ".html";
+  if (!isFile(f)) { res.writeHead(404); return res.end("not found"); }
   res.writeHead(200, { "content-type": MIME[path.extname(f)] || "application/octet-stream" });
   fs.createReadStream(f).pipe(res);
 });

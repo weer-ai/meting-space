@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { agenda, closing, cover, fromLog, idea, whyMe, whyNow } from "@/content/copy/home";
-import type { LogPost } from "@/lib/log";
+import { formatDate, type LogPost } from "@/lib/log";
 import ExploreButton from "./ExploreButton";
 import WaitlistForm from "./WaitlistForm";
 
@@ -172,7 +172,7 @@ export default function HomeStory({ posts }: { posts: LogPost[] }) {
                 {posts.map((p) => (
                   <div className="item" key={p.slug}>
                     <h3>
-                      <span className="meta">{p.date}</span>
+                      <span className="meta">{formatDate(p.date)}</span>
                       <Link href={`/log/${p.slug}`}>{p.title}</Link>
                     </h3>
                     <p>{p.summary}</p>

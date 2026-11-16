@@ -12,8 +12,9 @@ const server = http.createServer((req, res) => {
   let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
   if (p.endsWith("/")) p += "index.html";
   let f = path.join(ROOT, p);
-  if (!fs.existsSync(f) && fs.existsSync(f + ".html")) f += ".html";
-  if (!fs.existsSync(f)) { res.writeHead(404); return res.end(); }
+  const isFile = (x) => fs.existsSync(x) && fs.statSync(x).isFile();
+  if (!isFile(f) && isFile(f + ".html")) f += ".html";
+  if (!isFile(f)) { res.writeHead(404); return res.end(); }
   res.writeHead(200, { "content-type": MIME[path.extname(f)] || "application/octet-stream" });
   fs.createReadStream(f).pipe(res);
 });
@@ -101,6 +102,37 @@ const check = (name, ok, extra = "") => { results.push(ok); console.log(ok ? "PA
     const formVisible = await p.evaluate(() => { const r = document.querySelector("form.form").getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; });
     check(`${label}: "Join the waitlist" scrolls to the form`, formVisible);
     check(`${label}: no uncaught errors`, errors.length === 0, errors.join("; "));
+    await ctx.close();
+  }
+  // ---- navigation between pages ----
+  {
+    const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+    const p = await ctx.newPage();
+    const errors = [];
+    p.on("pageerror", (e) => errors.push(e.message));
+    await p.goto(base + "/", { waitUntil: "networkidle" });
+    await p.waitForTimeout(1200);
+    await p.getByRole("link", { name: "See the full agenda →" }).click();
+    await p.waitForURL("**/cohort");
+    check("nav: home -> /cohort via 'See the full agenda →'", (await p.locator("h1").textContent()) === "The Board · Cohort 01");
+    check("nav: /cohort carries no 3D canvas", (await p.locator("#gl").count()) === 0);
+    check("nav: week cards expand", await (async () => { const d = p.locator("details.week").first(); await d.locator("summary").click(); return d.evaluate((e) => e.open); })());
+    await p.getByRole("link", { name: "The minutes" }).click();
+    await p.waitForURL("**/minutes");
+    check("nav: footer link goes to /minutes", (await p.locator("h1").textContent()) === "The minutes.");
+    await p.getByRole("link", { name: /Explore the map/ }).first().click();
+    await p.waitForURL("**/?explore=1");
+    await p.waitForTimeout(2500);
+    check("nav: /minutes 'Explore the map' opens explore mode on the home page", await p.evaluate(() => document.body.classList.contains("explore")));
+    await p.goto(base + "/log/_", { waitUntil: "networkidle" });
+    await p.waitForTimeout(1500);
+    check("nav: placeholder /log/_ bounces to /log", await p.evaluate(() => location.pathname === "/log"), `(at ${await p.evaluate(() => location.pathname)})`);
+    await p.goto(base + "/cohort", { waitUntil: "networkidle" });
+    await p.getByRole("link", { name: "Join the waitlist" }).first().click();
+    await p.waitForURL("**/#waitlist");
+    await p.waitForTimeout(2500);
+    check("nav: /cohort 'Join the waitlist' lands on the home form", await p.evaluate(() => { const r = document.querySelector("form.form").getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }));
+    check("nav: no uncaught errors while navigating", errors.length === 0, errors.join("; "));
     await ctx.close();
   }
   await b.close();

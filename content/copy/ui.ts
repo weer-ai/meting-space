@@ -22,4 +22,13 @@ export const ui = {
   mapAria: "Map of experiences and the six modules they connect to", // NEW: a11y
   mapListLabel: "Map nodes", // NEW: a11y
   skipToWaitlist: "Join the waitlist", // CONTENT.md CTA
+  // Page names for the footer navigation. NEW: CONTENT.md names the pages but gives no nav labels.
+  navBoard: "The Board", // CONTENT.md page name for /cohort
+  navMinutes: "The minutes", // CONTENT.md /minutes headline, without the full stop
+  navLog: "From the log", // CONTENT.md (05) heading, reused for /log
+  navLabel: "Pages", // NEW: aria-label
+  // /log
+  logAllModules: "All", // v9 chip label
+  logModuleFilter: "Filter by module", // NEW: aria-label
+  logBack: "From the log", // NEW: back link on a post, same label as the nav
 } as const;
