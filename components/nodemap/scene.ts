@@ -16,6 +16,7 @@ import {
   WebGLRenderer,
 } from "three";
 import { ME_NOW_LABEL } from "@/data/story";
+import { BG_HEX, COL, DUST, LINE, LINE_RED, type RGB } from "./theme";
 import type { GNode, Graph } from "./graph";
 import { MAX_DUST, STAGES, buildDust, buildMesh, buildTargets, createRandoms, makeRng, type Targets } from "./layout";
 
@@ -93,16 +94,6 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const ease = (t: number) => t * t * (3 - 2 * t);
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
 
-type RGB = [number, number, number];
-const COL: Record<string, RGB> = {
-  p: [1, 0.82, 0.7],
-  kw: [1, 0.58, 0.5],
-  me: [1, 0.95, 0.9],
-  red: [0.95, 0.45, 0.4],
-  basket: [0.85, 0.62, 0.62],
-  worry: [0.8, 0.5, 0.48],
-};
-
 /**
  * Edge brightness per stage: [structural edges (experience -> module), the woven mesh].
  * Stages 1 and 2 are off on purpose: no net, nothing connects. It forms in stage 3.
@@ -146,7 +137,7 @@ export function createScene(o: SceneOptions): SceneController | null {
   renderer.outputColorSpace = LinearSRGBColorSpace;
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
   renderer.setPixelRatio(DPR);
-  renderer.setClearColor(0x0c0809, 1);
+  renderer.setClearColor(BG_HEX, 1);
 
   const scene = new Scene();
   const cam = new PerspectiveCamera(50, 1, 0.1, 100);
@@ -233,13 +224,7 @@ export function createScene(o: SceneOptions): SceneController | null {
     const c = (dust.geometry.attributes.col as BufferAttribute).array as Float32Array;
     const s = (dust.geometry.attributes.size as BufferAttribute).array as Float32Array;
     const a = (dust.geometry.attributes.alpha as BufferAttribute).array as Float32Array;
-    const pal: RGB[] = [
-      [1, 0.62, 0.5],
-      [0.92, 0.52, 0.64],
-      [1, 0.78, 0.42],
-      [0.86, 0.78, 0.74],
-      [0.86, 0.78, 0.74],
-    ];
+    const pal = DUST;
     for (let i = 0; i < DN; i++) {
       const v = pal[Math.floor(rnd() * pal.length)];
       c[i * 3] = v[0];
@@ -534,9 +519,9 @@ export function createScene(o: SceneOptions): SceneController | null {
     lineM += (kt[1] - lineM) * (reduced ? 1 : k2);
     const redT = (stA === 1 || stA === 2) && !ex ? 1 : 0;
     redMix += (redT - redMix) * (reduced ? 1 : k2);
-    const cr = lerp(1, 0.8, redMix);
-    const cg = lerp(0.62, 0.5, redMix);
-    const cb = lerp(0.5, 0.55, redMix);
+    const cr = lerp(LINE[0], LINE_RED[0], redMix);
+    const cg = lerp(LINE[1], LINE_RED[1], redMix);
+    const cb = lerp(LINE[2], LINE_RED[2], redMix);
     let w = 0;
     for (let e = 0; e < EN; e++) {
       const mesh = e >= E.length;
@@ -628,6 +613,8 @@ export function createScene(o: SceneOptions): SceneController | null {
           labEl[i].textContent = txt;
           // the words in the middle of "What is happening?" are the main picture of that stage
           if (n.kind === "me") labEl[i].classList.toggle("now", stA === 1);
+          // "The real problem" is told in red; the same nodes turn green once the net forms
+          if (n.kind === "pillar") labEl[i].classList.toggle("alert", stA === 2);
           labW[i] = 0;
         }
       }

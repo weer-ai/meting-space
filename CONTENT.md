@@ -11,7 +11,7 @@
 | Concept | Go long on yourself; life as a company | — |
 | Pages | `/` `/cohort` (The Board) `/minutes` `/log` `/zh/cohort` | — |
 | Course | 6 weeks, 6 modules (Discover → Resilience) | — |
-| Brand | me/ting space, Fraunces + Inter, warm black, apricot | — |
+| Brand | me/ting space, Fraunces + Inter | (11/17, Ting) New palette: deep space blue background, neon green for everything bright. Coral red stays as the alert colour |
 | Fact rule | No job titles; unconfirmed facts stay off | — |
 | Voice | First person, short sentences, numbers and names | Second person "you"; welcoming lines; honest "still building" notes |
 | Entry point | Waitlist (main action) | Free starter kit as a lighter second door, same email list |
@@ -374,9 +374,9 @@ Build on the existing 3D site. Don't rebuild. Keep the node map; only swap node 
 | Wordmark | `me/ting space`, Fraunces italic |
 | Headings | Fraunces (italic for emphasis words) |
 | Body & UI | Inter (Chinese fallback: Noto Sans TC) |
-| Background | Warm black `#0C0809` |
-| Primary accent | Apricot `#F4A58A`: numbering, primary buttons |
-| Alert colour | Coral red `#FF5A4D`: `[TBD]` tags, Why now section |
+| Background | Deep space blue `#060C28` |
+| Primary accent | Neon green `#39FF14`: numbering, primary buttons, italic emphasis, the net |
+| Alert colour | Coral red `#FF5A4D`: `[TBD]` tags, the worries in (01), "The real problem". The story reads red while it describes the problem and green once it describes the net |
 | Signature elements | Glowing 3D nodes, bracketed numbering (01)–(06), blurred pill labels |
 
 ## 3D node map

@@ -42,9 +42,10 @@ meting.space 是 Ting 的個人網站，從「航空體驗顧問」改版為**�
 - 候補名單表單欄位照 CONTENT.md；送出端點讀 `NEXT_PUBLIC_WAITLIST_ENDPOINT`，沒設定時退回 `mailto:`；自動帶上 `lang` 與網址上的 `utm_source`（`linkedin`、`ns`、`nomad`、`log`）。送出後文案照 CONTENT.md。
 - 日誌：`content/log/*.md`，frontmatter 為 `title`、`date`、`module`（Discover…Resilience，對應 01–06）、`summary`、`draft`；列表可依 module 篩選。
 
-## 視覺規則（以 v9 為準）
+## 視覺規則（以 v9 為準，**配色除外**）
 
-- 色彩：背景深暖黑 `#0C0809`、墨色 `#F6EFE8`、杏桃強調 `#F4A58A`、珊瑚紅 `#FF5A4D`（階段 1 偏紅群、`[TBD]` 標籤）。v9 把杏桃命名為 `--blue`，移植時改名 `--accent`。
+- 色彩（**Ting 2026-11-17 改版，取代 v9／Brief §1.4 的暖黑＋杏桃**）：背景宇宙深藍 `#060C28`、墨色 `#EAF2FF`、亮色一律螢光綠 `#39FF14`（`--accent`：按鈕、編號、斜體強調、網的連線）、警示色維持珊瑚紅 `#FF5A4D`（`[TBD]`、(01) 的焦慮、(02) 的問題）。故事「講問題時是紅、講網成形後是綠」。
+- 顏色只在兩處定義：`styles/global.css` 的 `:root`（半透明色一律用 `rgba(var(--accent-rgb), a)` 這類變數，不要再寫死 rgba），與 3D 的 `components/nodemap/theme.ts`。`tests/theme.test.ts` 會檢查兩邊的背景色一致、樣式裡沒有殘留舊的暖黑與杏桃。
 - 字體：Fraunces（標題、斜體強調、數字）＋ Inter（內文、介面）。中文備援 Noto Serif TC（僅 `/zh`）。
 - 字標沿用 v9 的 `me/ting space`（斜體 Fraunces）。
 - 括號編號 (01)–(06) 是簽名元素。
@@ -114,7 +115,7 @@ node scripts/pages.cjs --out DIR --dpr 2               # /cohort /minutes /log �
 
 - `content/copy/home.ts`：首頁英文文案，**必須逐字出自 CONTENT.md**，`tests/copy.test.ts` 會比對，改字就會失敗。`content/copy/ui.ts` 是 CONTENT.md 沒有的介面小字，每條標明來源（v9／新增／調整）。
 - `data/nodes.ts`（節點與支柱歸屬，文字逐字出自 Brief）、`data/story.ts`（五個支柱與三種標籤、九個焦慮詞，逐字出自 CONTENT.md）。
-- `components/nodemap/`：`graph.ts`（資料→節點與連線）、`layout.ts`（純函式、確定性佈局，含保護網 `shellPositions`／`buildMesh`、五個籃子）、`scene.ts`（three 場景、中心節點「The world today」、焦慮閃現、互動）。
+- `components/nodemap/`：`theme.ts`（3D 的顏色）、`graph.ts`（資料→節點與連線）、`layout.ts`（純函式、確定性佈局，含保護網 `shellPositions`／`buildMesh`、五個籃子）、`scene.ts`（three 場景、中心節點「The world today」、焦慮閃現、互動）。
 - `content/config.ts`：Ting 手動改的開關與連結（不是文案）。`content/copy/log.ts`：`/log` 的開場白。
 - `components/home/`：`HomeStory`（所有首頁段落，server）、`StarterKitForm`、`MentorPillars`（依支柱列事證，直接讀節點資料，未確認的帶紅色 [TBD]）、`HomeShell`（client，持有 canvas 與模式）、`ExploreUI`、`WaitlistForm`。
 - 內頁：`app/cohort`、`app/minutes`、`app/log`、`app/log/[slug]`；文案在 `content/copy/cohort.ts`、`minutes.ts`（同樣逐字比對）；樣式在 `styles/pages.css`；`components/Rich.tsx` 把文案裡的 `[TBD]` 轉成紅色標籤；`components/page/LogList.tsx` 是依 module 篩選的日誌列表。

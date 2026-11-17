@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { cover } from "@/content/copy/home";
 import { ui } from "@/content/copy/ui";
+import { BG_CSS } from "@/components/nodemap/theme";
 
 export const metadata: Metadata = {
   title: { default: ui.brand, template: `%s · ${ui.brand}` },
@@ -18,7 +19,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0C0809",
+  themeColor: BG_CSS,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
