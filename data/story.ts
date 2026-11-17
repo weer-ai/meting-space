@@ -26,7 +26,7 @@ export const PILLARS: {
 
 /**
  * What keeps people up at night right now. In "What is happening?" these nodes
- * take turns lighting up around today's date.
+ * take turns lighting up around "The world today".
  */
 export const WORRIES = [
   "Inflation",
@@ -40,5 +40,8 @@ export const WORRIES = [
   "Borders and visas",
 ] as const;
 
-/** The me/ting centre node label (cover and closing). In "What is happening?" it shows today's date instead. */
+/** The centre node label on the cover and in the closing. */
 export const ME_LABEL = "me/ting";
+
+/** The centre node label in "What is happening?": the world the worries are lighting up around. */
+export const ME_NOW_LABEL = "The world today";

@@ -108,7 +108,7 @@ body.explore #gl {
   background: rgba(40, 10, 10, 0.55);
   padding: 6px 10px;
 }
-.lab.me.date {
+.lab.me.now {
   font: italic 400 20px/1 var(--serif);
   padding: 7px 14px;
   border-color: rgba(255, 235, 225, 0.75);

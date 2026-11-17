@@ -48,7 +48,7 @@
 # HOME `/`
 
 Order: Cover → (01) What is happening? → (02) The real problem → (03) The idea → Is this for you? → (04) The method → (05) Meet your mentor → (06) From the log (only when there are posts) → Starter kit → Meet me in Hengchun (Dec only) → Closing → Footer.
-The 3D node map stays in the background throughout and tells the same story as the copy: a finished net on the cover, today's date with the worries around it, five separate baskets, the net forming, the six modules, the evidence, the net pulled tight at the close (see "3D node map" in the Tech spec).
+The 3D node map stays in the background throughout and tells the same story as the copy: a finished net on the cover, "The world today" with the worries around it, five separate baskets, the net forming, the six modules, the evidence, the net pulled tight at the close (see "3D node map" in the Tech spec).
 
 The five pillars are the structure of the net, of (02) and of (05): Skills, Income, Places, People, Money. Flag theory (spread where you live, earn and keep assets) belongs to Places and Money; Five friends belongs to People.
 
@@ -67,7 +67,7 @@ The five pillars are the structure of the net, of (02) and of (05): Skills, Inco
 
 **Result line:** You are not falling behind. The ground is moving.
 
-3D: the middle node shows the visitor's date; the nodes around it light up in turn, three at a time for two to three seconds each: Inflation · AI · Robots taking jobs · Layoffs · Job hunting · Can't keep up · Rising rent · Stale skills · Borders and visas
+3D: the middle node reads *The world today*; the nodes around it light up in turn, three at a time for two to three seconds each: Inflation · AI · Robots taking jobs · Layoffs · Job hunting · Can't keep up · Rising rent · Stale skills · Borders and visas
 
 (With reduced motion nothing flashes and a few stay lit. With no WebGL the same words are listed as text tags.)
 
@@ -192,6 +192,8 @@ Five pillar nodes change their words from stage to stage: the net on the cover, 
 | Places | One place | More than one place |
 | People | One circle | More than one circle |
 | Money | One pot | More than one pot |
+
+The middle node reads *me/ting* on the cover and in the closing, and *The world today* in (01).
 
 ## Footer
 
@@ -383,7 +385,7 @@ Built on the existing site, not rebuilt. The map and its look stay; the data and
 
 - Five kinds of node: the centre (`me/ting`), five **pillars** (Skills, Income, Places, People, Money), six **modules** (Discover → Resilience), the **experiences** (each on one pillar, linked to its modules), and nine **worries** that only appear in (01).
 - Data in `data/nodes.ts` (experiences, with `pillar`, `modules`, `text`, `proof`, `tbd`) and `data/story.ts` (pillars, worries). One entry per experience; no code change to add one. Text is verbatim from the node table in `DESIGN-BRIEF.md`.
-- Seven stages, one per home section (Is this for you?, the starter kit, Hengchun and the closing share a stage with the section next to them): cover = a finished net; (01) = a loose cloud with today's date in the middle and the worries lighting up; (02) = five separate baskets, no lines; (03) = the net forms; (04) = the six modules; (05) = the evidence; closing = the net pulled tight.
+- Seven stages, one per home section (Is this for you?, the starter kit, Hengchun and the closing share a stage with the section next to them): cover = a finished net; (01) = a loose cloud with "The world today" in the middle and the worries lighting up; (02) = five separate baskets, no lines; (03) = the net forms; (04) = the six modules; (05) = the evidence; closing = the net pulled tight.
 - Home: scrolling narrative over the map; "Explore the map" opens it full screen (`/?explore=1` from `/minutes`).
 - Mobile must read fully without interaction; the map is a background. With reduced motion it holds still and cross-fades; with no WebGL a still image and text tags take over.
 

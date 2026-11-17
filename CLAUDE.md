@@ -66,7 +66,7 @@ meting.space 是 Ting 的個人網站，從「航空體驗顧問」改版為**�
 | 階段 | 段落 | 形狀 | 顯示標籤 | 連線 |
 | --- | --- | --- | --- | --- |
 | 0 | Cover | 外殼：一張已經織好的保護網包住 `me/ting` | `me/ting` ＋ 五個支柱名（Skills、Income、Places、People、Money） | 結構＋網 |
-| 1 | (01) What is happening? | 鬆散的雲；**中心節點是訪客當天的日期**，周圍的焦慮節點輪流亮起 | 日期＋亮著的焦慮標籤（一次 3 個、各 2–3 秒） | 關閉 |
+| 1 | (01) What is happening? | 鬆散的雲；**中心節點寫 `The world today`**，周圍的焦慮節點輪流亮起 | `The world today`＋亮著的焦慮標籤（一次 3 個、各 2–3 秒） | 關閉 |
 | 2 | (02) The real problem | 五個互不相通的籃子，偏紅 | `One skill`、`One income`、`One place`、`One circle`、`One pot` | 關閉 |
 | 3 | (03) The idea、Is this for you? | 球，網成形、連線變亮 | 同五個節點換字：`Stacked skills`、`More than one income/place/circle/pot` | 結構亮、網淡 |
 | 4 | (04) The method | 球 | 六個模組 | 結構＋網 |
@@ -75,7 +75,7 @@ meting.space 是 Ting 的個人網站，從「航空體驗顧問」改版為**�
 
 - 五個支柱節點只在階段 0、2、3 顯示；焦慮節點只在階段 1 顯示（其他階段 alpha 為 0）。
 - 開啟 reduced-motion：焦慮標籤不閃，固定亮其中 4 個。沒有 WebGL：`.worry-list` 以文字標籤列出。
-- 日期在瀏覽器端用訪客當地的日期（`scene.ts` 的 `DATE`）。
+- 中心節點的字在階段 1 是 `The world today`（`data/story.ts` 的 `ME_NOW_LABEL`），其餘階段是 `me/ting`。2026-11-17 Ting 把原本的「訪客當天日期」改成這句。
 
 **資料（Brief §3）：** 資料放 `data/nodes`，程式只讀資料。`Node = { id, name, year?, pillar: "skill"|"income"|"place"|"people"|"money", modules: Module[], text, proof?, tbd? }`（Brief 的 `group` 已改名為 `pillar` 並擴成五個）。支柱歸屬由 Ting 核准，改動前先問。只用 Brief 起始節點表與履歷已載明的事實。`tbd` 只決定卡片上是否顯示紅色 `[TBD]`，內部備註不進資料。
 
@@ -114,7 +114,7 @@ node scripts/pages.cjs --out DIR --dpr 2               # /cohort /minutes /log �
 
 - `content/copy/home.ts`：首頁英文文案，**必須逐字出自 CONTENT.md**，`tests/copy.test.ts` 會比對，改字就會失敗。`content/copy/ui.ts` 是 CONTENT.md 沒有的介面小字，每條標明來源（v9／新增／調整）。
 - `data/nodes.ts`（節點與支柱歸屬，文字逐字出自 Brief）、`data/story.ts`（五個支柱與三種標籤、九個焦慮詞，逐字出自 CONTENT.md）。
-- `components/nodemap/`：`graph.ts`（資料→節點與連線）、`layout.ts`（純函式、確定性佈局，含保護網 `shellPositions`／`buildMesh`、五個籃子）、`scene.ts`（three 場景、日期節點、焦慮閃現、互動）。
+- `components/nodemap/`：`graph.ts`（資料→節點與連線）、`layout.ts`（純函式、確定性佈局，含保護網 `shellPositions`／`buildMesh`、五個籃子）、`scene.ts`（three 場景、中心節點「The world today」、焦慮閃現、互動）。
 - `content/config.ts`：Ting 手動改的開關與連結（不是文案）。`content/copy/log.ts`：`/log` 的開場白。
 - `components/home/`：`HomeStory`（所有首頁段落，server）、`StarterKitForm`、`MentorPillars`（依支柱列事證，直接讀節點資料，未確認的帶紅色 [TBD]）、`HomeShell`（client，持有 canvas 與模式）、`ExploreUI`、`WaitlistForm`。
 - 內頁：`app/cohort`、`app/minutes`、`app/log`、`app/log/[slug]`；文案在 `content/copy/cohort.ts`、`minutes.ts`（同樣逐字比對）；樣式在 `styles/pages.css`；`components/Rich.tsx` 把文案裡的 `[TBD]` 轉成紅色標籤；`components/page/LogList.tsx` 是依 module 篩選的日誌列表。
@@ -145,7 +145,7 @@ node scripts/pages.cjs --out DIR --dpr 2               # /cohort /minutes /log �
 - 開發 branch：`claude/gracious-allen-o3kejp`。不經 Ting 要求不開 PR、不推其他 branch。首頁、`/cohort`、`/minutes`、`/log` 已完成；表單接線待做。**推 `main` 會直接更新正式網站（Vercel Production），只有 Ting 明說 merge 才推。**
 - 順序：首頁（七拍故事線＋v3 新區塊）與內頁已完成，待 Ting 確認截圖 → 接表單（候補名單、starter kit，`/log` 訂閱表單的欄位與按鈕文字尚未定）→ `/cohort` 對齊新故事線（暫定，見 CONTENT.md 最後的 Open items）→ `/zh/cohort` 等 Ting 說可以才做。
 - 每個階段完成都要在**手機 390px 與桌機 1440px**各截一張圖檢查（Playwright 內建 Chromium；無頭模式要開 swiftshader 才有 WebGL），文字不可被節點蓋住；截圖給 Ting 看之後才往下做。
-- 收尾對照 Brief §6 驗收清單（階段數以七階段為準）：七階段依序變形且每段停得住；階段 1 有日期與閃現、階段 2 五個籃子、階段 3 換字；探索模式全功能；resize 不跳位；reduced motion 與 WebGL 失敗有替代畫面；`[TBD]` 都是紅色標籤且無內部說明；Lighthouse 行動版效能 ≥ 80。
+- 收尾對照 Brief §6 驗收清單（階段數以七階段為準）：七階段依序變形且每段停得住；階段 1 有 The world today 與閃現、階段 2 五個籃子、階段 3 換字；探索模式全功能；resize 不跳位；reduced motion 與 WebGL 失敗有替代畫面；`[TBD]` 都是紅色標籤且無內部說明；Lighthouse 行動版效能 ≥ 80。
 
 ## 尚未決定（開發時照現有文案先做，不要自行拍板）
 

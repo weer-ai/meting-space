@@ -41,7 +41,7 @@ const check = (name, ok, extra = "") => { results.push(ok); console.log(ok ? "PA
     const stageAfterAnchor = parseFloat(await p.evaluate(() => document.documentElement.dataset.mapStage));
     check(`${label}: "Get the free starter kit ↓" lands on the starter kit (stage 6)`, Math.abs(stageAfterAnchor - 6) < 0.06, `(stage=${stageAfterAnchor})`);
     check(`${label}: the starter kit form is on screen`, await p.evaluate(() => { const r = document.querySelector("#kit form").getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }));
-    // "What is happening?": today's date in the middle, worries taking turns
+    // "What is happening?": "The world today" in the middle, worries taking turns
     await p.evaluate(() => scrollTo(0, document.getElementById("happening").getBoundingClientRect().top + scrollY));
     await p.waitForTimeout(3500);
     const seen = new Set();
@@ -52,9 +52,8 @@ const check = (name, ok, extra = "") => { results.push(ok); console.log(ok ? "PA
       maxAtOnce = Math.max(maxAtOnce, lit.length);
       await p.waitForTimeout(350);
     }
-    const today = await p.evaluate(() => new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }));
     const meText = await p.evaluate(() => { const e = document.querySelector("#labels .lab.me"); return e ? e.textContent : null; });
-    check(`${label}: the middle node shows today's date`, meText === today, `(label=${meText}, today=${today})`);
+    check(`${label}: the middle node reads "The world today"`, meText === "The world today", `(label=${meText})`);
     check(`${label}: worries take turns lighting up (saw ${seen.size} different, at most ${maxAtOnce} at once)`, seen.size >= 4 && maxAtOnce <= 4, `[${[...seen].join(", ")}]`);
     await p.evaluate(() => scrollTo(0, 0));
     await p.waitForTimeout(500);

@@ -52,7 +52,7 @@ export default function HomeStory({ posts }: { posts: LogPost[] }) {
         </div>
       </section>
 
-      {/* 1 · (01) What is happening? Today's date in the middle, worries lighting up around it */}
+      {/* 1 · (01) What is happening? "The world today" in the middle, worries lighting up around it */}
       <section className="s" id="happening" data-stage="1">
         <div className="shade" />
         <div className="wrap">

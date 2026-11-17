@@ -6,7 +6,7 @@ import * as cohort from "@/content/copy/cohort";
 import * as minutes from "@/content/copy/minutes";
 import * as log from "@/content/copy/log";
 import { EXPERIENCES, MODULES } from "@/data/nodes";
-import { PILLARS, WORRIES } from "@/data/story";
+import { ME_LABEL, ME_NOW_LABEL, PILLARS, WORRIES } from "@/data/story";
 
 /**
  * "English copy is copied verbatim" is enforced here: every string that ships
@@ -93,6 +93,10 @@ describe("3D map labels are verbatim from CONTENT.md (v2 home story)", () => {
       expect(CONTENT).toContain(w);
     });
   }
+  it("the centre node words are in CONTENT.md", () => {
+    expect(CONTENT).toContain(ME_LABEL);
+    expect(CONTENT).toContain(ME_NOW_LABEL);
+  });
   it("the worries are listed together in CONTENT.md, in this order", () => {
     expect(CONTENT).toContain(WORRIES.join(" · "));
   });

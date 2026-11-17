@@ -15,6 +15,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from "three";
+import { ME_NOW_LABEL } from "@/data/story";
 import type { GNode, Graph } from "./graph";
 import { MAX_DUST, STAGES, buildDust, buildMesh, buildTargets, createRandoms, makeRng, type Targets } from "./layout";
 
@@ -32,7 +33,7 @@ import { MAX_DUST, STAGES, buildDust, buildMesh, buildTargets, createRandoms, ma
  *
  * The story (approved 2026-11-16) has seven stages:
  *   0 cover            a woven net of finished diversification around me/ting
- *   1 what is happening  today's date in the middle, worries lighting up around it
+ *   1 what is happening  "The world today" in the middle, worries lighting up around it
  *   2 the real problem   five separate baskets (one skill, one income, ...)
  *   3 the idea           the baskets join up, the net forms
  *   4 the method         six modules
@@ -132,8 +133,6 @@ export function createScene(o: SceneOptions): SceneController | null {
     EP[e] = pair[0];
     EQ[e] = pair[1];
   }
-  /** The date the visitor opens the page on: the middle node of "What is happening?". */
-  const DATE = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   // Match the v9 look (it was built on three r128, which did no colour management).
   ColorManagement.enabled = false;
@@ -304,7 +303,7 @@ export function createScene(o: SceneOptions): SceneController | null {
     }
   };
   const textFor = (n: GNode, st: number): string => {
-    if (n.kind === "me") return st === 1 ? DATE : n.name;
+    if (n.kind === "me") return st === 1 ? ME_NOW_LABEL : n.name;
     if (n.kind === "pillar") return st === 2 ? n.concentrated! : st === 3 ? n.diversified! : n.name;
     return n.name;
   };
@@ -627,8 +626,8 @@ export function createScene(o: SceneOptions): SceneController | null {
         if (labTxt[i] !== txt) {
           labTxt[i] = txt;
           labEl[i].textContent = txt;
-          // the date in the middle of "What is happening?" is the main picture of that stage
-          if (n.kind === "me") labEl[i].classList.toggle("date", stA === 1);
+          // the words in the middle of "What is happening?" are the main picture of that stage
+          if (n.kind === "me") labEl[i].classList.toggle("now", stA === 1);
           labW[i] = 0;
         }
       }
