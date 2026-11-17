@@ -10,9 +10,9 @@ export const cover = {
   headline: "The world now moves faster than any career. Go long on yourself.",
   /** Part of the headline set in italics. */
   headlineEm: "Go long on yourself.",
-  sub: "Skills, income, places and people that hold each other up, like a net. A six-week life-design cohort by someone who runs her own life this way.",
+  sub: "Stack your skills, build more than one line, spread your risk, and let your life compound. I've been testing this on my own life for fifteen years. Here's the method, and the receipts.",
   cta: "Join the waitlist",
-  secondary: "What is happening ↓",
+  secondary: "Get the free starter kit ↓",
 };
 
 export const happening = {
@@ -49,7 +49,8 @@ export const problem = {
     },
   ],
   result: "You would never put your whole portfolio in one stock. Most of us put our whole life in one.",
-  bridge: "The answer is not to predict the future. It is to be positioned for several of them.",
+  bridge:
+    "If that feels uncomfortably familiar, you're not behind. You're early. The answer is not to predict the future. It is to be positioned for several of them.",
 };
 
 export const idea = {
@@ -67,7 +68,26 @@ export const idea = {
     ["A board", "Five people who tell you the truth"],
     ["A risk register", "Risk spread across places and assets"],
   ] as const,
-  line: "I am not a coach with a motivational script. I am a designer who applied the same methods to her own life, and kept the receipts.",
+  line: "I'm not a coach with a motivational script. I'm a designer who applied the same methods to her own life, and kept the receipts. I'll show you how, step by step.",
+};
+
+export const forYou = {
+  title: "Is this for you?",
+  items: [
+    {
+      lead: "You already explore,",
+      text: "whether that's remote work, travel, a side project or a startup, and want to turn scattered experiments into a strategy that pays.",
+    },
+    {
+      lead: "You're good at your job, maybe senior,",
+      text: "and quietly aware that one employer, one skill and one country is a lot to bet on.",
+    },
+    {
+      lead: "Either way,",
+      text: "you like frameworks, spreadsheets and honest numbers more than affirmations.",
+    },
+  ],
+  link: "Who The Board is for →",
 };
 
 export const method = {
@@ -93,7 +113,7 @@ export const method = {
 export const mentor = {
   num: "(05)",
   title: "Meet your mentor",
-  lead: "I am the first client of this method. Fifteen years, five countries, three kinds of work, and one rule: design it, test it, then commit.",
+  lead: "I'm the first client of this method. Fifteen years, five countries, three kinds of work, and one rule: design it, test it, then commit.",
   /** One line per pillar; the evidence under each line comes from data/nodes.ts. */
   pillars: {
     skill: "Design, business, money and AI building, layered over fifteen years.",
@@ -103,19 +123,44 @@ export const mentor = {
     money: "Two years, no salary, by design.",
   },
   nowLabel: "Right now:",
-  now: "I am building a startup with no salary for two years, and running this playbook in public so you can watch it work, or not.",
+  now: "I'm building a startup with no salary for two years, and running this playbook in public so you can watch it work, or not. You don't have to take my word for any of it.",
   cta: "Read the minutes →",
 };
 
 export const fromLog = {
   num: "(06)",
   title: "From the log",
-  lead: "The live case study. Real numbers, real decisions, including the ones that did not work.",
+  lead: "The live case study. Real numbers, real decisions, including the ones that didn't work. Honestly, some of it is still messy. That's the point.",
+};
+
+export const kit = {
+  title: "Not ready for six weeks? Start with the toolkit I use on myself.",
+  intro: "Three templates, free:",
+  items: [
+    "Ikigai canvas: where you really stand",
+    "Life ledger: your money, as a company would see it",
+    "Runway calculator: how many months your experiments can last",
+  ],
+  submit: "Send me the kit",
+  note: "Honest note: I'm still polishing parts of it. You'll get each piece by email as it's ready.",
+  success: "On its way. Each piece arrives as it's ready.",
+};
+
+/** Time-limited block. Shown while SHOW_HENGCHUN is true (content/config.ts). */
+export const hengchun = {
+  eyebrow: "First week of December · Hengchun, Taiwan",
+  title: "Let's sit down for an hour.",
+  /** 花花生活節 is the festival's name and ships as written. */
+  body: "I'll be at 花花生活節 in Hengchun with Terminal Taiwan's builder house. For one week I'm opening one-on-one sessions for nomads and founders: bring your next move, and we'll map it like a company would.",
+  facts: ["1:1 · [duration TBD]", "In person or online", "[price TBD]", "Limited slots"],
+  cta: "Book a session",
+  note: "Can't make it? Join the waitlist and you'll hear about the first cohort first.",
 };
 
 export const closing = {
   title: "Take a seat at your own board.",
-  body: "The first cohort is small on purpose. Join the waitlist and tell me where you are stuck. I read every answer.",
+  body: "The first cohort is small on purpose. Join the waitlist and tell me where you're stuck. I read every answer.",
+  note: "Joining is free. It's not a payment or a commitment.",
 };
 
 export const waitlist = {
@@ -134,13 +179,13 @@ export const waitlist = {
     options: ["Career direction", "Money and runway", "Starting something", "Moving countries", "Other"],
   },
   price: {
-    label: "If Cohort 01 costs [price TBD], would you consider joining?",
+    label: "If Cohort 01 costs [test price TBD], would you consider joining?",
     options: ["Yes", "Maybe, depends on dates", "Not at that price"],
   },
   anything: "Anything else?",
   sendLog: "Send me the log too",
   submit: "Join the waitlist",
-  success: "You are on the list. I read every answer, and I will write before the doors open.",
+  success: "You're on the list. I read every answer, and I'll write before the doors open.",
 };
 
 export const footer = {

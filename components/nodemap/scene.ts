@@ -354,10 +354,16 @@ export function createScene(o: SceneOptions): SceneController | null {
 
   let secs: HTMLElement[] = [];
   let tops: number[] = [];
+  /** The story stage each section belongs to (data-stage). Several sections may share one. */
+  let stageOf: number[] = [];
   function measure() {
     secs = Array.from(document.querySelectorAll<HTMLElement>("section.s"));
     const y = window.scrollY;
     tops = secs.map((s) => s.getBoundingClientRect().top + y);
+    stageOf = secs.map((s, i) => {
+      const v = Number(s.dataset.stage);
+      return Number.isFinite(v) ? v : i;
+    });
   }
 
   function stageFromScroll() {
@@ -372,7 +378,10 @@ export function createScene(o: SceneOptions): SceneController | null {
     // hold the stage in the first 45% of the section, morph in the last 55%
     let t = f < 0.45 ? 0 : (f - 0.45) / 0.55;
     t = ease(t);
-    return i + (i < n - 1 ? t : 0);
+    // morph from this section's stage to the next one's (a no-op when they share a stage)
+    const s0 = stageOf[i];
+    const s1 = i < n - 1 ? stageOf[i + 1] : s0;
+    return s0 + (s1 - s0) * (i < n - 1 ? t : 0);
   }
 
   const matches = (i: number) => {

@@ -54,10 +54,10 @@ const NAMES = ["0-cover", "1-happening", "2-problem", "3-idea", "4-method", "5-m
     await page.waitForTimeout(800);
 
     const secs = await page.evaluate(() =>
-      Array.from(document.querySelectorAll("section.s")).map((s) => ({ top: s.getBoundingClientRect().top + scrollY, h: s.offsetHeight })),
+      Array.from(document.querySelectorAll("section.s")).map((s) => ({ top: s.getBoundingClientRect().top + scrollY, h: s.offsetHeight, id: s.id, stage: Number(s.dataset.stage) })),
     );
-    const settle = async (i, file) => {
-      await page.waitForFunction((t) => Math.abs(parseFloat(document.documentElement.dataset.mapStage || "-9") - t) < (t === 0 ? 0.12 : 0.04), i, { timeout: 20000 }).catch(() => problems.push(`stage ${i} did not settle`));
+    const settle = async (stage, file) => {
+      await page.waitForFunction((t) => Math.abs(parseFloat(document.documentElement.dataset.mapStage || "-9") - t) < (t === 0 ? 0.12 : 0.04), stage, { timeout: 20000 }).catch(() => problems.push(`stage ${stage} did not settle`));
       await page.waitForTimeout(1500);
       await page.screenshot({ path: file });
       console.log("wrote", file);
@@ -67,7 +67,7 @@ const NAMES = ["0-cover", "1-happening", "2-problem", "3-idea", "4-method", "5-m
         // "top" = section top aligned with the viewport top, what an anchor jump shows
         const y = f === "top" ? Math.round(secs[i].top) : Math.max(0, Math.round(secs[i].top + f * secs[i].h - vp.height * 0.5));
         await page.evaluate((y) => window.scrollTo(0, y), y);
-        await settle(i, path.join(OUT, `${vname}-${NAMES[i]}-${f === "top" ? "top" : Math.round(f * 100)}.png`));
+        await settle(secs[i].stage, path.join(OUT, `${vname}-${String(i).padStart(2, "0")}-${secs[i].id}-${f === "top" ? "top" : Math.round(f * 100)}.png`));
       }
     }
     // closing: start of the section, the form, the very bottom (footer)
@@ -80,7 +80,7 @@ const NAMES = ["0-cover", "1-happening", "2-problem", "3-idea", "4-method", "5-m
     ];
     for (const [label, y] of closing) {
       await page.evaluate((y) => window.scrollTo(0, y), y);
-      await settle(last, path.join(OUT, `${vname}-${last}-closing-${label}.png`));
+      await settle(secs[last].stage, path.join(OUT, `${vname}-${last}-closing-${label}.png`));
     }
 
     // explore mode, via the deep link used by /minutes

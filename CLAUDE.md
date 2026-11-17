@@ -6,7 +6,7 @@ meting.space 是 Ting 的個人網站，從「航空體驗顧問」改版為**�
 
 | 檔案 | 管什麼 |
 | --- | --- |
-| `CONTENT.md` | **文案與頁面架構**（英文上線文案、頁面、表單欄位、日誌格式）。首頁部分是 **v2（2026-11-16，Ting 核准）** |
+| `CONTENT.md` | **文案與頁面架構**（英文上線文案、頁面、表單欄位、日誌格式）。**v3 合併版（2026-11-17）**：以 Ting 的 v3 為底，首頁套用 11/16 核准的七拍故事線。Ting 原檔留在 `reference/CONTENT-v3-merged.md` |
 | `DESIGN-BRIEF.md` | **3D 節點圖、視覺、技術做法、驗收清單** |
 | `reference/meting-space-v9-node-map.html` | v9 原型：視覺與動態的**參考**，只讀，不直接上線、不修改 |
 
@@ -15,7 +15,7 @@ meting.space 是 Ting 的個人網站，從「航空體驗顧問」改版為**�
 - **文案**以 `CONTENT.md` 為準。
 - **視覺與技術**以 `DESIGN-BRIEF.md` 為準。Brief 明講：視覺以 v9 為準，**取代** CONTENT.md「視覺與技術規格」裡舊的 IBM Plex Mono／藍色品牌表（`#2A2FD8` 藍、`#D93B23` 紅、Georgia、米白格線紙、`me[TING]` 紅括號字標、尺規刻度）。
 - Brief 的資料模型取代 CONTENT.md 的 `nodes.json` 欄位（`role`、`result`、`links[]`）與「五群」說法。
-- **首頁的階段與節點（七階段、五個支柱）以本檔「3D 節點圖規則」為準**：Ting 於 2026-11-16 核准新故事線，`DESIGN-BRIEF.md` §2 的六階段表與 `Group` 欄位已過時，**不要照 Brief 改回去**。Brief 其餘（視覺、技術要求、驗收清單）仍有效。
+- **首頁的階段與節點（七階段、五個支柱）以本檔「3D 節點圖規則」為準**：Ting 於 2026-11-16 核准新故事線，2026-11-17 決定與 v3 合併（標題用 B、副標用 v3、恆春區塊手動開關）。`DESIGN-BRIEF.md` §2 的六階段表與 `Group` 欄位已過時，**不要照 Brief 或 v3 的舊首頁結構改回去**。Brief 其餘（視覺、技術要求、驗收清單）仍有效。
 - 兩份文件沒涵蓋、或彼此矛盾又無法判斷的地方：**停下來問 Ting，不要自己決定**。
 
 ## 文案規則（最重要）
@@ -24,7 +24,7 @@ meting.space 是 Ting 的個人網站，從「航空體驗顧問」改版為**�
 2. 英文是上線文案；文件裡的中文只是給開發者對照的意思，**不上線**（`/zh/cohort` 除外，見下）。
 3. 文件裡標明「備選」的 headline 不上線，只用主 headline。
 4. `[TBD]` 一律保留，以**紅色標籤**顯示（價格、日期、人數、退款政策、第一期月份等）。不要自己填數字、不要刪。
-5. 上線版**不出現**任何只寫給 Ting 看的內容：v9 的 `.todo` 說明、左下「Draft」徽章、`(P2)`／`(P13)` 這類代號、中文內部備註。這些內部備註不得進入送到瀏覽器的資料或 HTML。
+5. 上線版**不出現**任何只寫給 Ting 看的內容：v9 的 `.todo` 說明、左下「Draft」徽章、`(P2)`／`(P13)` 這類代號、中文內部備註。這些內部備註不得進入送到瀏覽器的資料或 HTML。**唯一的中文例外**是 Ting 英文文案裡的專有名詞「花花生活節」（恆春區塊），測試只放行這一個。連結用的 `[TBD: booking link]`、`[TBD: Terminal Taiwan Luma link]` 是給開發者的備註，上線只顯示紅色 `[TBD]`；文案裡的 `[duration TBD]`、`[price TBD]`、`[TBD refund policy]` 等則照原樣以紅字顯示。
 6. **未查證的事實不上線**：專利數量（7 個）、Lufthansa +12%／+18%、SkyTeam 18 家航空、語言程度。不從 v9 原型把這些數字帶回來；不自行新增事實、數字、獎項、客戶名稱。
 7. 文件沒寫到的介面小字（按鈕、提示、aria 標籤等）：優先沿用 v9 原型的字；必須新增時用最少的字，並在回報時列出，讓 Ting 逐條確認。
 8. 中文頁 `/zh/cohort` 要等英文版定稿、且 Ting 說可以才寫；不要預先翻譯或寫中文文案。
@@ -32,8 +32,10 @@ meting.space 是 Ting 的個人網站，從「航空體驗顧問」改版為**�
 ## 網站架構
 
 - 頁面：`/`、`/cohort`、`/minutes`、`/log`、`/log/[slug]`、`/zh/cohort`。
-- 首頁七個段落 = 七個 3D 階段（`100svh`，內容較長的段落用 `min-height`）：Cover → (01) What is happening? → (02) The real problem → (03) The idea → (04) The method → (05) Meet your mentor → Closing。
-- (06) From the log 併進 Closing：標題下方列最新 2–3 篇日誌連結（只列 `draft: false` 的；沒有就整塊不顯示，不編造文章）。
+- 首頁段落（`100svh`，內容較長的用 `min-height`）：Cover → (01) What is happening? → (02) The real problem → (03) The idea → Is this for you? → (04) The method → (05) Meet your mentor → (06) From the log（有已發佈日誌才顯示）→ Starter kit → Meet me in Hengchun（限時，手動開關）→ Closing。
+- 每個 `section.s` 用 `data-stage` 指定所屬的 3D 階段（0–6），**相鄰段落可共用一個階段**（Is this for you? 與 The idea 同為 3；Starter kit、Hengchun、Closing 同為 6）。場景在段落之間從前一段的階段平滑變到下一段的階段，同階段則不動。新增段落時只要設 `data-stage`，不必改場景。
+- 恆春區塊的開關與兩個待補連結在 `content/config.ts`（`SHOW_HENGCHUN`、`HENGCHUN_BOOKING_URL`、`TERMINAL_TAIWAN_URL`）。連結為空時按鈕停用並顯示紅色 `[TBD]`。活動結束後由 Ting 說了才把 `SHOW_HENGCHUN` 改成 false。
+- Starter kit 是「第二道門」：只收 email、標籤 `kit`、同一份名單。候補名單與 starter kit 的表單目前都**尚未送出**（待接線）。
 - 所有頁面共用 footer：email、LinkedIn、「For teams and talks」一行連結、財稅免責聲明（文案見 CONTENT.md）。
 - `/minutes` 的「Explore the map」連到 `/?explore=1`，首頁讀到參數直接進探索模式。
 - 3D 只在首頁載入，其他頁面不背 three.js。
@@ -66,10 +68,10 @@ meting.space 是 Ting 的個人網站，從「航空體驗顧問」改版為**�
 | 0 | Cover | 外殼：一張已經織好的保護網包住 `me/ting` | `me/ting` ＋ 五個支柱名（Skills、Income、Places、People、Money） | 結構＋網 |
 | 1 | (01) What is happening? | 鬆散的雲；**中心節點是訪客當天的日期**，周圍的焦慮節點輪流亮起 | 日期＋亮著的焦慮標籤（一次 3 個、各 2–3 秒） | 關閉 |
 | 2 | (02) The real problem | 五個互不相通的籃子，偏紅 | `One skill`、`One income`、`One place`、`One circle`、`One pot` | 關閉 |
-| 3 | (03) The idea | 球，網成形、連線變亮 | 同五個節點換字：`Stacked skills`、`More than one income/place/circle/pot` | 結構亮、網淡 |
+| 3 | (03) The idea、Is this for you? | 球，網成形、連線變亮 | 同五個節點換字：`Stacked skills`、`More than one income/place/circle/pot` | 結構亮、網淡 |
 | 4 | (04) The method | 球 | 六個模組 | 結構＋網 |
 | 5 | (05) Meet your mentor | 球 | 證據節點（`proof: true`） | 結構＋網 |
-| 6 | Closing | 同一張網收緊（半徑 0.5R）包住你 | `me/ting` | 結構＋網（網較亮） |
+| 6 | Starter kit、Hengchun、Closing | 同一張網收緊（半徑 0.5R）包住你 | `me/ting` | 結構＋網（網較亮） |
 
 - 五個支柱節點只在階段 0、2、3 顯示；焦慮節點只在階段 1 顯示（其他階段 alpha 為 0）。
 - 開啟 reduced-motion：焦慮標籤不閃，固定亮其中 4 個。沒有 WebGL：`.worry-list` 以文字標籤列出。
@@ -98,7 +100,7 @@ npm run dev          # 開發
 npm run build        # 靜態輸出到 out/
 npm run typecheck
 npm test             # vitest：文案逐字比對 + 佈局確定性
-node scripts/shots.cjs --out DIR --dpr 2 --pos top     # 手機390／桌機1440 截圖（需先 build）
+node scripts/shots.cjs --out DIR --dpr 2 --pos top     # 手機390／桌機1440 截圖，每段一張，檔名含段落 id（需先 build）
 node scripts/interact.cjs                              # 探索模式、點擊、鍵盤、錨點
 node scripts/states.cjs --out DIR                      # reduced-motion、WebGL 失敗
 node scripts/pages.cjs --out DIR --dpr 2               # /cohort /minutes /log 整頁截圖，檢查溢出與 console 錯誤
@@ -113,7 +115,8 @@ node scripts/pages.cjs --out DIR --dpr 2               # /cohort /minutes /log �
 - `content/copy/home.ts`：首頁英文文案，**必須逐字出自 CONTENT.md**，`tests/copy.test.ts` 會比對，改字就會失敗。`content/copy/ui.ts` 是 CONTENT.md 沒有的介面小字，每條標明來源（v9／新增／調整）。
 - `data/nodes.ts`（節點與支柱歸屬，文字逐字出自 Brief）、`data/story.ts`（五個支柱與三種標籤、九個焦慮詞，逐字出自 CONTENT.md）。
 - `components/nodemap/`：`graph.ts`（資料→節點與連線）、`layout.ts`（純函式、確定性佈局，含保護網 `shellPositions`／`buildMesh`、五個籃子）、`scene.ts`（three 場景、日期節點、焦慮閃現、互動）。
-- `components/home/`：`HomeStory`（七段落，server）、`MentorPillars`（依支柱列事證，直接讀節點資料，未確認的帶紅色 [TBD]）、`HomeShell`（client，持有 canvas 與模式）、`ExploreUI`、`WaitlistForm`。
+- `content/config.ts`：Ting 手動改的開關與連結（不是文案）。`content/copy/log.ts`：`/log` 的開場白。
+- `components/home/`：`HomeStory`（所有首頁段落，server）、`StarterKitForm`、`MentorPillars`（依支柱列事證，直接讀節點資料，未確認的帶紅色 [TBD]）、`HomeShell`（client，持有 canvas 與模式）、`ExploreUI`、`WaitlistForm`。
 - 內頁：`app/cohort`、`app/minutes`、`app/log`、`app/log/[slug]`；文案在 `content/copy/cohort.ts`、`minutes.ts`（同樣逐字比對）；樣式在 `styles/pages.css`；`components/Rich.tsx` 把文案裡的 `[TBD]` 轉成紅色標籤；`components/page/LogList.tsx` 是依 module 篩選的日誌列表。
 - 日誌：`lib/log.ts` 讀 `content/log/*.md`（`draft: true` 不會出現在任何地方；缺 title／date／module 會讓 build 失敗而不是半成品上線；module 可寫名稱或 1–6）。`lib/markdown.ts` 渲染並 sanitize。測試與預覽可用環境變數 `LOG_DIR` 指到別的資料夾（`tests/fixtures/log`），**不要把假文章放進 `content/log`**。
 
@@ -140,12 +143,12 @@ node scripts/pages.cjs --out DIR --dpr 2               # /cohort /minutes /log �
 ## 工作流程
 
 - 開發 branch：`claude/gracious-allen-o3kejp`。不經 Ting 要求不開 PR、不推其他 branch。首頁、`/cohort`、`/minutes`、`/log` 已完成；表單接線待做。**推 `main` 會直接更新正式網站（Vercel Production），只有 Ting 明說 merge 才推。**
-- 順序：首頁與內頁已完成 → **首頁改版為七拍故事線（進行中，待 Ting 確認截圖）** → 接表單 → `/cohort` 對齊新故事線（暫定，見 CONTENT.md「待確認事項」）→ `/zh/cohort` 等 Ting 說可以才做。
+- 順序：首頁（七拍故事線＋v3 新區塊）與內頁已完成，待 Ting 確認截圖 → 接表單（候補名單、starter kit，`/log` 訂閱表單的欄位與按鈕文字尚未定）→ `/cohort` 對齊新故事線（暫定，見 CONTENT.md 最後的 Open items）→ `/zh/cohort` 等 Ting 說可以才做。
 - 每個階段完成都要在**手機 390px 與桌機 1440px**各截一張圖檢查（Playwright 內建 Chromium；無頭模式要開 swiftshader 才有 WebGL），文字不可被節點蓋住；截圖給 Ting 看之後才往下做。
 - 收尾對照 Brief §6 驗收清單（階段數以七階段為準）：七階段依序變形且每段停得住；階段 1 有日期與閃現、階段 2 五個籃子、階段 3 換字；探索模式全功能；resize 不跳位；reduced motion 與 WebGL 失敗有替代畫面；`[TBD]` 都是紅色標籤且無內部說明；Lighthouse 行動版效能 ≥ 80。
 
 ## 尚未決定（開發時照現有文案先做，不要自行拍板）
 
-`/cohort` 的六週標題是否換成方法名、與首頁新故事線的呼應（Ting 說之後討論，已記在 CONTENT.md 待確認事項）；三個我加的焦慮詞（Rising rent、Stale skills、Borders and visas）與各經歷的支柱歸屬待 Ting 過目；
+`/cohort` 的六週標題是否換成方法名、與首頁新故事線的呼應（Ting 說之後討論，已記在 CONTENT.md 的 Open items）；三個我加的焦慮詞（Rising rent、Stale skills、Borders and visas）與各經歷的支柱歸屬待 Ting 過目；首頁 (01) 結尾與 (02) 銜接句的「not behind」是否重複；Hengchun 預約連結與 Terminal Taiwan Luma 連結；
 
 第一批客群（Cover 與「Who it is for」之後可能收窄）、語言策略、「two years, no salary」與 ledger／新加坡公司的公開程度、「awards as a founder」是哪個獎（沒有的話要改成「and founder programmes」）、專利數量／Lufthansa 數字／語言能力、第一期價格人數日期退款、email 工具、部署平台、LinkedIn 網址。

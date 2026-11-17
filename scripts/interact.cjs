@@ -36,12 +36,14 @@ const check = (name, ok, extra = "") => { results.push(ok); console.log(ok ? "PA
     await p.waitForTimeout(1500);
 
     // anchors
-    await p.getByRole("link", { name: "What is happening ↓" }).click();
+    await p.getByRole("link", { name: "Get the free starter kit ↓" }).click();
     await p.waitForTimeout(2500);
     const stageAfterAnchor = parseFloat(await p.evaluate(() => document.documentElement.dataset.mapStage));
-    check(`${label}: "What is happening ↓" lands on stage 1`, Math.abs(stageAfterAnchor - 1) < 0.06, `(stage=${stageAfterAnchor})`);
+    check(`${label}: "Get the free starter kit ↓" lands on the starter kit (stage 6)`, Math.abs(stageAfterAnchor - 6) < 0.06, `(stage=${stageAfterAnchor})`);
+    check(`${label}: the starter kit form is on screen`, await p.evaluate(() => { const r = document.querySelector("#kit form").getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }));
     // "What is happening?": today's date in the middle, worries taking turns
-    await p.waitForTimeout(1500);
+    await p.evaluate(() => scrollTo(0, document.getElementById("happening").getBoundingClientRect().top + scrollY));
+    await p.waitForTimeout(3500);
     const seen = new Set();
     let maxAtOnce = 0;
     for (let k = 0; k < 24; k++) {
@@ -113,7 +115,7 @@ const check = (name, ok, extra = "") => { results.push(ok); console.log(ok ? "PA
     // join the waitlist anchor
     await p.getByRole("link", { name: "Join the waitlist" }).first().click();
     await p.waitForTimeout(2500);
-    const formVisible = await p.evaluate(() => { const r = document.querySelector("form.form").getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; });
+    const formVisible = await p.evaluate(() => { const r = document.querySelector("#waitlist form").getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; });
     check(`${label}: "Join the waitlist" scrolls to the form`, formVisible);
     check(`${label}: no uncaught errors`, errors.length === 0, errors.join("; "));
     await ctx.close();
@@ -145,7 +147,7 @@ const check = (name, ok, extra = "") => { results.push(ok); console.log(ok ? "PA
     await p.getByRole("link", { name: "Join the waitlist" }).first().click();
     await p.waitForURL("**/#waitlist");
     await p.waitForTimeout(2500);
-    check("nav: /cohort 'Join the waitlist' lands on the home form", await p.evaluate(() => { const r = document.querySelector("form.form").getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }));
+    check("nav: /cohort 'Join the waitlist' lands on the home form", await p.evaluate(() => { const r = document.querySelector("#waitlist form").getBoundingClientRect(); return r.top < innerHeight && r.bottom > 0; }));
     check("nav: no uncaught errors while navigating", errors.length === 0, errors.join("; "));
     await ctx.close();
   }

@@ -6,7 +6,7 @@
 
 export const hero = {
   title: "The minutes.",
-  lead: "Everything I teach, I tried on myself first. Here is the record.",
+  lead: "Everything I teach, I tried on myself first. Here's the record.",
   mapCta: "Explore the map",
 };
 
@@ -44,11 +44,11 @@ export const lines = {
 
 export const means = {
   title: "What this means for you",
-  lead: "Changing direction is a skill. I have done it on purpose, more than once, and measured what it cost.",
+  lead: "Changing direction is a skill. I've done it on purpose, more than once, and measured what it cost, so you don't have to guess.",
   items: [
     "I know what it feels like to start over in a new country and a new language.",
     "I know the spreadsheet behind a calm decision.",
-    "I know which experiments were cheap and which were not.",
+    "I know which experiments were cheap and which weren't.",
   ],
 };
 
@@ -57,12 +57,17 @@ export const now = {
   items: [
     { lead: "Weer", text: "a rental marketplace so travellers can pack less. Two years, no salary, by design." },
     { lead: "The Board", text: "this cohort, and the log where I run the method in public." },
-    { lead: "Taiwan", text: "helping international builders settle here, on the side." },
+    {
+      lead: "Taiwan",
+      text: "Terminal Taiwan, helping international builders settle here, on the side.",
+      /** Linked when TERMINAL_TAIWAN_URL is set (content/config.ts); until then it carries a red [TBD]. */
+      link: "Building in Taiwan? →",
+    },
   ],
 };
 
 export const closing = {
   cta: "Join the waitlist",
-  /** Copied exactly as written, including "→ email". Ask Ting whether "email" was only a note about where the link goes. */
+  /** Copied exactly as written, including "→ email". */
   secondary: "Teams and talks → email",
 };

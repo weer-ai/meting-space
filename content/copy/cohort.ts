@@ -1,14 +1,12 @@
 /**
  * /cohort copy, verbatim from CONTENT.md ("Cohort 頁文案"). Checked by tests/copy.test.ts.
  *
- * Every [TBD] stays and renders as a red label. CONTENT.md writes the refund
- * placeholder as "[TBD 退款政策]"; the Chinese part is a note for Ting, so only
- * "[TBD]" ships.
+ * Every [TBD] stays and renders as a red label.
  */
 
 export const hero = {
   title: "The Board · Cohort 01",
-  sub: "Six weeks to design, test and fund the next version of your life.",
+  sub: "Six weeks to design, test and fund the next version of your life, with a small group doing the same.",
   facts: ["6 weeks", "Live, online", "Small group [TBD]", "Starts [TBD]"],
   cta: "Join the waitlist",
 };
@@ -17,18 +15,18 @@ export const who = {
   title: "Who it is for",
   items: [
     {
-      lead: "The professional at a crossroads.",
-      text: "You are good at your job, maybe senior, and quietly aware that one employer, one skill and one country is a lot to bet on. You want options before you need them.",
+      lead: "The explorer.",
+      text: "You already work remotely, travel, have a side project or run a startup. You want to turn scattered experiments into a strategy that pays.",
     },
     {
-      lead: "The explorer.",
-      text: "You already work remotely, travel, or have a side project. You want to turn scattered experiments into a strategy that pays.",
+      lead: "The professional at a crossroads.",
+      text: "You're good at your job, maybe senior, and quietly aware that one employer, one skill and one country is a lot to bet on. You want options before you need them.",
     },
   ],
   either: "Either way, you like frameworks, spreadsheets and honest numbers more than affirmations.",
   notFor: {
     lead: "Not for you if",
-    text: "you want someone to tell you what to do, or a guaranteed income plan.",
+    text: "you want someone to tell you what to do, or a guaranteed income plan. I share what I tested. You decide what fits.",
   },
 };
 
@@ -78,7 +76,7 @@ export const agenda = {
 export const how = {
   title: "How it works",
   items: [
-    { lead: "Live sessions:", text: "one per week, online. Recordings for those in other time zones [TBD]." },
+    { lead: "Live sessions:", text: "one per week, online. Recordings for other time zones [TBD]." },
     { lead: "Weekly assignment:", text: "one worksheet, about two hours." },
     { lead: "Peer board:", text: "small groups that review each other's decisions." },
     { lead: "Templates you keep:", text: "life ledger, Ikigai canvas, runway calculator." },
@@ -90,11 +88,12 @@ export const faq = {
   items: [
     {
       q: "Is this financial or tax advice?",
-      a: "No. I share what I did and why. For your own case, I will point you to a licensed professional.",
+      a: "No. I share what I did and why. For your own case, I'll point you to a licensed professional.",
     },
     { q: "Do I need to quit my job?", a: "No. Most experiments in week 3 fit around a full-time job." },
-    { q: "What does it cost?", a: "[TBD] Waitlist members hear first." },
-    { q: "What if it is not for me?", a: "[TBD]" },
+    { q: "What does it cost?", a: "[TBD] Waitlist members hear first and get an early-bird price." },
+    { q: "Does joining the waitlist commit me to anything?", a: "No. It's free, and it's not a payment." },
+    { q: "What if it's not for me?", a: "[TBD refund policy]" },
   ],
 };
 

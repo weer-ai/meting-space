@@ -487,6 +487,41 @@ body.no-map .worry-list li {
   line-height: 1.4;
 }
 
+/* small print under a block */
+.note {
+  margin-top: 12px;
+  color: var(--mute);
+  font-size: 13px;
+  line-height: 1.45;
+  max-width: 52ch;
+}
+.soft-link {
+  color: var(--soft);
+}
+.pill:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* starter kit */
+.kit-list {
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+.kit-list li {
+  border-left: 2px solid rgba(244, 165, 138, 0.45);
+  padding-left: 12px;
+  color: var(--soft);
+  font-size: 14.5px;
+  line-height: 1.4;
+}
+.kit-form {
+  grid-template-columns: 1fr;
+  max-width: 460px;
+}
+
 /* ---------- waitlist ---------- */
 .form-wrap {
   margin-top: 22px;

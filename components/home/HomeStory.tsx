@@ -1,9 +1,13 @@
 import Link from "next/link";
-import { closing, cover, fromLog, happening, idea, mentor, method, problem } from "@/content/copy/home";
+import Rich from "@/components/Rich";
+import TbdTag from "@/components/TbdTag";
+import { closing, cover, forYou, fromLog, happening, hengchun, idea, kit, mentor, method, problem } from "@/content/copy/home";
+import { HENGCHUN_BOOKING_URL, SHOW_HENGCHUN } from "@/content/config";
 import { WORRIES } from "@/data/story";
 import { formatDate, type LogPost } from "@/lib/log";
 import ExploreButton from "./ExploreButton";
 import MentorPillars from "./MentorPillars";
+import StarterKitForm from "./StarterKitForm";
 import WaitlistForm from "./WaitlistForm";
 
 /** Renders `text` with the substring `em` set in italics. The words are never altered. */
@@ -20,14 +24,15 @@ function Em({ text, em }: { text: string; em: string }) {
 }
 
 /**
- * The seven home sections. Each `section.s` is one stage of the 3D map
- * (see CLAUDE.md "七階段"). All copy comes from content/copy/home.ts.
+ * The home sections. Each `section.s` belongs to one stage of the 3D map through
+ * `data-stage` (see CLAUDE.md "七階段"); sections next to each other may share a
+ * stage. All copy comes from content/copy/home.ts.
  */
 export default function HomeStory({ posts }: { posts: LogPost[] }) {
   return (
     <main>
       {/* 0 · Cover: the finished net */}
-      <section className="s" id="s0" data-stage="0">
+      <section className="s" id="cover" data-stage="0">
         <div className="shade" />
         <div className="wrap">
           <div className="hello">{cover.eyebrow}</div>
@@ -39,7 +44,7 @@ export default function HomeStory({ posts }: { posts: LogPost[] }) {
             <a className="pill accent" href="#waitlist">
               {cover.cta}
             </a>
-            <a className="link" href="#s1">
+            <a className="link" href="#kit">
               {cover.secondary}
             </a>
             <ExploreButton className="pill ghost explore-inline" />
@@ -48,7 +53,7 @@ export default function HomeStory({ posts }: { posts: LogPost[] }) {
       </section>
 
       {/* 1 · (01) What is happening? Today's date in the middle, worries lighting up around it */}
-      <section className="s" id="s1" data-stage="1">
+      <section className="s" id="happening" data-stage="1">
         <div className="shade" />
         <div className="wrap">
           <div className="eyebrow">
@@ -67,7 +72,7 @@ export default function HomeStory({ posts }: { posts: LogPost[] }) {
       </section>
 
       {/* 2 · (02) The real problem: five separate baskets */}
-      <section className="s" id="s2" data-stage="2">
+      <section className="s" id="problem" data-stage="2">
         <div className="shade" />
         <div className="wrap">
           <div className="eyebrow">
@@ -92,7 +97,7 @@ export default function HomeStory({ posts }: { posts: LogPost[] }) {
       </section>
 
       {/* 3 · (03) The idea: run your life like a company */}
-      <section className="s" id="s3" data-stage="3">
+      <section className="s" id="idea" data-stage="3">
         <div className="shade" />
         <div className="wrap">
           <div className="eyebrow">
@@ -122,8 +127,29 @@ export default function HomeStory({ posts }: { posts: LogPost[] }) {
         </div>
       </section>
 
+      {/* Is this for you? Same stage as the idea: the net has formed */}
+      <section className="s" id="foryou" data-stage="3">
+        <div className="shade" />
+        <div className="wrap">
+          <h2>{forYou.title}</h2>
+          <div className="list">
+            {forYou.items.map((it) => (
+              <div className="item" key={it.lead}>
+                <h3>{it.lead}</h3>
+                <p>{it.text}</p>
+              </div>
+            ))}
+          </div>
+          <div className="cta">
+            <Link className="link" href="/cohort">
+              {forYou.link}
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* 4 · (04) The method: six tools, one per week */}
-      <section className="s" id="s4" data-stage="4">
+      <section className="s" id="method" data-stage="4">
         <div className="shade" />
         <div className="wrap">
           <div className="eyebrow">
@@ -150,7 +176,7 @@ export default function HomeStory({ posts }: { posts: LogPost[] }) {
       </section>
 
       {/* 5 · (05) Meet your mentor: evidence by pillar */}
-      <section className="s" id="s5" data-stage="5">
+      <section className="s" id="mentor" data-stage="5">
         <div className="shade" />
         <div className="wrap">
           <div className="eyebrow">
@@ -170,32 +196,89 @@ export default function HomeStory({ posts }: { posts: LogPost[] }) {
         </div>
       </section>
 
-      {/* 6 · Closing: the net pulled tight, with (06) From the log folded in when there are posts */}
-      <section className="s closing" id="s6" data-stage="6">
+      {/* (06) From the log: only when there is something to read */}
+      {posts.length > 0 && (
+        <section className="s" id="log" data-stage="5">
+          <div className="shade" />
+          <div className="wrap">
+            <div className="eyebrow">
+              <b>{fromLog.num}</b>
+            </div>
+            <h2>{fromLog.title}</h2>
+            <p className="lede">{fromLog.lead}</p>
+            <div className="list">
+              {posts.map((p) => (
+                <div className="item" key={p.slug}>
+                  <h3>
+                    <span className="meta">{formatDate(p.date)}</span>
+                    <Link href={`/log/${p.slug}`}>{p.title}</Link>
+                  </h3>
+                  <p>{p.summary}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Starter kit: the lighter second door. From here the net is pulled tight. */}
+      <section className="s" id="kit" data-stage="6">
+        <div className="shade" />
+        <div className="wrap">
+          <h2>{kit.title}</h2>
+          <p className="lede">{kit.intro}</p>
+          <ul className="kit-list">
+            {kit.items.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+          <StarterKitForm />
+          <p className="note">{kit.note}</p>
+        </div>
+      </section>
+
+      {/* Meet me in Hengchun: time-limited, switched off by hand (content/config.ts) */}
+      {SHOW_HENGCHUN && (
+        <section className="s" id="hengchun" data-stage="6">
+          <div className="shade" />
+          <div className="wrap">
+            <div className="eyebrow">{hengchun.eyebrow}</div>
+            <h2>{hengchun.title}</h2>
+            <p className="lede">{hengchun.body}</p>
+            <ul className="facts">
+              {hengchun.facts.map((f) => (
+                <li key={f}>
+                  <Rich text={f} />
+                </li>
+              ))}
+            </ul>
+            <div className="cta">
+              {HENGCHUN_BOOKING_URL ? (
+                <a className="pill accent" href={HENGCHUN_BOOKING_URL} target="_blank" rel="noopener noreferrer">
+                  {hengchun.cta}
+                </a>
+              ) : (
+                <>
+                  {/* no booking link yet: the button waits, with a red [TBD] */}
+                  <button type="button" className="pill accent" disabled>
+                    {hengchun.cta}
+                  </button>
+                  <TbdTag />
+                </>
+              )}
+            </div>
+            <p className="note">{hengchun.note}</p>
+          </div>
+        </section>
+      )}
+
+      {/* Closing: the waitlist */}
+      <section className="s closing" id="closing" data-stage="6">
         <div className="shade" />
         <div className="wrap">
           <h2>{closing.title}</h2>
           <p className="lede">{closing.body}</p>
-          {posts.length > 0 && (
-            <div className="log">
-              <div className="eyebrow" style={{ marginTop: 20 }}>
-                <b>{fromLog.num}</b>
-              </div>
-              <h3 style={{ font: "400 22px/1.1 var(--serif)" }}>{fromLog.title}</h3>
-              <p className="lede">{fromLog.lead}</p>
-              <div className="list">
-                {posts.map((p) => (
-                  <div className="item" key={p.slug}>
-                    <h3>
-                      <span className="meta">{formatDate(p.date)}</span>
-                      <Link href={`/log/${p.slug}`}>{p.title}</Link>
-                    </h3>
-                    <p>{p.summary}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <p className="note">{closing.note}</p>
           <div className="form-wrap" id="waitlist">
             <WaitlistForm />
           </div>

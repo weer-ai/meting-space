@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { closing, hero, lines, means, now } from "@/content/copy/minutes";
 import { SITE } from "@/content/copy/ui";
+import { TERMINAL_TAIWAN_URL } from "@/content/config";
+import TbdTag from "@/components/TbdTag";
 
 export const metadata: Metadata = { title: "The minutes", description: hero.lead };
 
@@ -52,7 +54,22 @@ export default function MinutesPage() {
         <ul className="plain-list">
           {now.items.map((it) => (
             <li key={it.lead}>
-              <strong>{it.lead}</strong> — {it.text}
+              <strong>{it.lead}</strong>: {it.text}
+              {"link" in it && it.link && (
+                <>
+                  {" "}
+                  {TERMINAL_TAIWAN_URL ? (
+                    <a className="link" href={TERMINAL_TAIWAN_URL} target="_blank" rel="noopener noreferrer">
+                      {it.link}
+                    </a>
+                  ) : (
+                    // no link yet: the words stay, with a red [TBD]
+                    <span className="soft-link">
+                      {it.link} <TbdTag />
+                    </span>
+                  )}
+                </>
+              )}
             </li>
           ))}
         </ul>

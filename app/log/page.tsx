@@ -3,9 +3,10 @@ import Link from "next/link";
 import LogList from "@/components/page/LogList";
 import { fromLog } from "@/content/copy/home";
 import { cover } from "@/content/copy/home";
+import { logPage } from "@/content/copy/log";
 import { formatDate, getAllPosts } from "@/lib/log";
 
-export const metadata: Metadata = { title: fromLog.title, description: fromLog.lead };
+export const metadata: Metadata = { title: fromLog.title, description: logPage.intro };
 
 export default function LogPage() {
   const posts = getAllPosts();
@@ -13,7 +14,7 @@ export default function LogPage() {
     <main className="page">
       <header className="page-hero">
         <h1>{fromLog.title}</h1>
-        <p className="page-lead">{fromLog.lead}</p>
+        <p className="page-lead">{logPage.intro}</p>
       </header>
       {posts.length > 0 ? (
         <section className="sec">
